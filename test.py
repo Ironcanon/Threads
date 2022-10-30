@@ -105,8 +105,13 @@ while running:
         # draw player 1's view  to the top left corner
         screen.blit(human_screen, (0,0))
     if alienPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, alien_screen):
-        # draw player 1's view  to the top left corner
         screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
-
+    
+    # After the moves are made, check if the alien and human have collided, killing the human
+    human_screen.blit(alienPlayer.surf, alienPlayer.rect)
+    if pygame.sprite.collide_rect(humanPlayer, alienPlayer):
+        running = False
+    else:
+        human_screen.blit(alienPlayer.replaceSurf, alienPlayer.rect)
     clock.tick(30)
     pygame.display.flip()

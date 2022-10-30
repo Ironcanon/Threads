@@ -18,6 +18,8 @@ class Human(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect()
         self.rect.move_ip(100, 100)
 
+        self.lives = 3
+
         self.moveUp = True
         self.moveDown = True
         self.moveLeft = True
@@ -82,3 +84,5 @@ class Human(pygame.sprite.Sprite):
             else:
                 self.moveRight = True       
             self.rect.move_ip(-5, 0)  
+
+        

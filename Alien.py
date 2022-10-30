@@ -10,8 +10,8 @@ from pygame.locals import (
 class Alien(pygame.sprite.Sprite):
     def __init__(self):
         super(Alien, self).__init__()
-        self.surf = pygame.Surface((10, 10))
-        self.replaceSurf = pygame.Surface((10, 10))
+        self.surf = pygame.Surface((15, 15))
+        self.replaceSurf = pygame.Surface((15, 15))
         self.surf.fill((255, 0, 0))
         self.replaceSurf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()

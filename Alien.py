@@ -1,4 +1,3 @@
-# Import the pygame module
 import pygame
 
 from pygame.locals import (
@@ -8,34 +7,40 @@ from pygame.locals import (
     K_RIGHT
 )
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, startX, startY):
-        super(Player, self).__init__()
+class Alien(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Alien, self).__init__()
         self.surf = pygame.Surface((10, 10))
-        self.surf.fill((0, 255, 0))
+        self.replaceSurf = pygame.Surface((10, 10))
+        self.surf.fill((255, 0, 0))
+        self.replaceSurf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
-        self.rect.move_ip(startX, startY)
+        self.rect.move_ip(400, 400)
 
         self.moveUp = True
         self.moveDown = True
         self.moveLeft = True
         self.moveRight = True
 
-    def update(self, keyFlags, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup):
+    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, alienScreen):
         moveMade = False
-        if keysPressed[keyFlags[0]] and self.moveUp:
+        if keysPressed[K_UP] and self.moveUp:
+            alienScreen.blit(self.replaceSurf, self.rect)
             self.rect.move_ip(0, -5)
             moveMade = True
             self.checkDirections(wallGroup)
-        if keysPressed[keyFlags[1]] and self.moveDown:
+        if keysPressed[K_DOWN] and self.moveDown:
+            alienScreen.blit(self.replaceSurf, self.rect)
             self.rect.move_ip(0, 5)
             moveMade = True
             self.checkDirections(wallGroup)
-        if keysPressed[keyFlags[2]] and self.moveLeft:
+        if keysPressed[K_LEFT] and self.moveLeft:
+            alienScreen.blit(self.replaceSurf, self.rect)            
             self.rect.move_ip(-5, 0)
             moveMade = True
             self.checkDirections(wallGroup)
-        if keysPressed[keyFlags[3]] and self.moveRight:
+        if keysPressed[K_RIGHT] and self.moveRight:
+            alienScreen.blit(self.replaceSurf, self.rect)
             self.rect.move_ip(5, 0)
             moveMade = True
             self.checkDirections(wallGroup)
@@ -49,6 +54,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
+
+        alienScreen.blit(self.surf, self.rect)
 
         return moveMade
 
@@ -73,4 +80,4 @@ class Player(pygame.sprite.Sprite):
                 self.moveRight = False
             else:
                 self.moveRight = True       
-            self.rect.move_ip(-5, 0)     
+            self.rect.move_ip(-5, 0)  

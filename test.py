@@ -1,7 +1,8 @@
 # Import the pygame module
 import pygame
 from shapes import generate_maze, gen_walls_array
-from Player import Player
+from Alien import Alien
+from Human import Human
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
@@ -68,10 +69,13 @@ for sub_screen in screens:
     for entity in all_sprites:
         sub_screen.blit(entity.surf, entity.rect)
 
-player = Player(100, 100)
-all_sprites.add(player)
+alienPlayer = Alien()
+humanPlayer = Human()
+all_sprites.add(alienPlayer)
+all_sprites.add(humanPlayer)
 
-screens[0].blit(player.surf, player.rect)
+screens[0].blit(humanPlayer.surf, humanPlayer.rect)
+screens[1].blit(alienPlayer.surf, alienPlayer.rect)
 
 # draw player 1's view  to the top left corner
 screen.blit(human_screen, (0,0))
@@ -97,14 +101,11 @@ while running:
     # Get all the keys currently pressed
     pressed_keys = pygame.key.get_pressed()
 
-    if player.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls):
-        for currentScreen in screens:
-            currentScreen.fill((0, 0, 0))
-            for sprite in all_sprites:
-                currentScreen.blit(sprite.surf, sprite.rect)
+    if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen):
         # draw player 1's view  to the top left corner
         screen.blit(human_screen, (0,0))
-        # player 2's view is in the top right corner
+    if alienPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, alien_screen):
+        # draw player 1's view  to the top left corner
         screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
 
     clock.tick(30)

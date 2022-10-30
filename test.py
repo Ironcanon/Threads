@@ -63,9 +63,10 @@ all_sprites = pygame.sprite.Group()
 dirty_sprites = pygame.sprite.Group()
 floor = pygame.sprite.Group()
 heated_cells = pygame.sprite.Group()
+seenCells = pygame.sprite.Group()
 
 def screen_blit(sprite):
-    human_screen.blit(sprite.surf, sprite.rect)
+    human_screen.blit(sprite.humanSurf, sprite.rect)
     alien_screen.blit(sprite.surf, sprite.rect)
 
 for row in board:
@@ -108,17 +109,28 @@ while running:
         # Did the user click the window close button? If so, stop the loop.
         elif event.type == QUIT:
             running = False
+    coldCells = []
     for cell in heated_cells:
         cell.reduce_heat()
+        if cell.heat == 0:
+            coldCells.append(cell)
         screen_blit(cell)
+    for currentCell in coldCells:
+        heated_cells.remove(currentCell)
         
     # Get all the keys currently pressed
     pressed_keys = pygame.key.get_pressed()
 
-    if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen):
-        # draw player 1's view  to the top left corner
-        screen.blit(human_screen, (0,0))
+    madeMove = False
+
+    if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen, alien_screen, floor, heated_cells, seenCells):
+        madeMove = True
+
     if alienPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, alien_screen):
+        madeMove = True
+    
+    if madeMove:
+        screen.blit(human_screen, (0,0))
         screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
     
     # After the moves are made, check if the alien and human have collided, killing the human

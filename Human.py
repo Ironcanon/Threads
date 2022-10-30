@@ -25,25 +25,33 @@ class Human(pygame.sprite.Sprite):
         self.moveLeft = True
         self.moveRight = True
 
-    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen):
+    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen, alienScreen, cells, heatedCells, seenCells):
         moveMade = False
+        currentCell = pygame.sprite.spritecollideany(self, cells)
+        if currentCell != None:
+            currentCell.add_heat()
+            heatedCells.add(currentCell)
         if keysPressed[K_w] and self.moveUp:
             humanScreen.blit(self.replaceSurf, self.rect)
+            alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(0, -5)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_s] and self.moveDown:
             humanScreen.blit(self.replaceSurf, self.rect)
+            alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(0, 5)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_a] and self.moveLeft:
             humanScreen.blit(self.replaceSurf, self.rect)
+            alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(-5, 0)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_d] and self.moveRight:
             humanScreen.blit(self.replaceSurf, self.rect)
+            alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(5, 0)
             moveMade = True
             self.checkDirections(wallGroup)

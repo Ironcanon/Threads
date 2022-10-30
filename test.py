@@ -1,8 +1,9 @@
 # Import the pygame module
 import pygame
-from shapes import generate_maze, gen_walls_array
+from shapes import GAP, gen_walls_array
 from Alien import Alien
 from Human import Human
+import pickle
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
@@ -49,8 +50,13 @@ screens = [human_screen, alien_screen]
 
 screen.fill((0, 0, 0))
 
-board = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
-# print(board)
+with open("board.txt",'r') as file:
+    file.write(str(board))
+
+board, (start_alien, start_human) = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
+# with open("board.txt",'w') as file:
+#     file.write(str(board))
+
 walls = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 dirty_sprites = pygame.sprite.Group()
@@ -66,19 +72,15 @@ for row in board:
         if cell.isWall:
             walls.add(cell)
         else:
-            if(len(heated_cells) < 10):
-                cell.add_heat()
-                heated_cells.add(cell)
             floor.add(cell)
                 
         all_sprites.add(cell)
-        
 
 for entity in all_sprites:
     screen_blit(entity)
 
-alienPlayer = Alien()
-humanPlayer = Human()
+alienPlayer = Alien((GAP*start_alien, 0))
+humanPlayer = Human((GAP*start_human, SCREEN_HEIGHT))
 all_sprites.add(alienPlayer)
 all_sprites.add(humanPlayer)
 

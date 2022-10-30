@@ -15,6 +15,17 @@ class Cell(pygame.sprite.Sprite):
         self.surf = pygame.Surface((GAP, GAP))
         self.surf.fill((255,255,255) if isWall else (0,0,0))
         self.rect = self.surf.get_rect(center=(x+GAP/2, y+GAP/2))
+        self.heat = heat
+    
+    def add_heat(self):
+        self.heat = 1
+        self.surf.fill((255, 0, 0, 1))
+        
+    def reduce_heat(self):
+        if self.heat > 0:
+            self.heat-=1
+            self.surf.set_alpha(self.heat) 
+        
 
 def generate_maze(width, hight):
     walls = []

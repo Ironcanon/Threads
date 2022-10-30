@@ -19,8 +19,16 @@ def generate_maze(width, hight):
 
     walls.extend(room(0,0,14*GAP,8*GAP,12*GAP,7*GAP))
     walls.extend(room(2*GAP,10*GAP,8*GAP,18*GAP,3*GAP,17*GAP))
+    walls.extend(room(2*GAP,10*GAP,8*GAP,18*GAP,3*GAP,17*GAP))
+    walls.extend(room(10*GAP,10*GAP,16*GAP,18*GAP,11*GAP,17*GAP))
+    walls.extend(room(18*GAP,10*GAP,width,18*GAP,19*GAP,17*GAP))
+    walls.append(Wall(GAP*2, GAP*2, 22*GAP, 13*GAP))
+    walls.append(Wall(GAP*2, GAP*2, 26*GAP, 13*GAP))
+    walls.append(Wall(GAP*2, GAP*2, 30*GAP, 13*GAP))
+    walls.append(Wall(GAP*2, GAP*2, 34*GAP, 13*GAP))
+    walls.append(Wall(GAP*2, GAP*2, 38*GAP, 13*GAP))
     walls.extend(room(13*GAP,0,width,8*GAP,14*GAP,7*GAP))
-
+    
     walls.append(Wall(GAP, GAP, GAP, hight-GAP, colour=(0,0,0)))
     walls.append(Wall(GAP, GAP, width-GAP*2, 0, colour=(0,0,0)))
     return walls

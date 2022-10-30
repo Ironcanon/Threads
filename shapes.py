@@ -1,7 +1,7 @@
 from random import choice, randint
 import pygame
 
-GAP = 20
+GAP = 30
 
 class Cell(pygame.sprite.Sprite):
     def __init__(self, x, y, isWall=False, heat=0):
@@ -49,8 +49,14 @@ def gen_walls_array(screen_width, screen_hight):
 
     return (walls, (rand_top, rand_bot))
 
-def gen_walls_array(string_board):
-    pass
+def gen_walls_array_from_list(board):
+    walls = []
+    for y, line in enumerate(board):
+        cells = []
+        for x, val in enumerate(line):
+            cells.append(Cell(x, y, val))
+        walls.append(cells)
+    return (walls, (board[0].index(0), board[-1].index(0)))
 
 def gen_random_rooms(walls,num_width, num_hight, number_of_rooms, max_size, min_size=3):
     added_rooms = []

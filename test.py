@@ -1,9 +1,9 @@
 # Import the pygame module
 import pygame
-from shapes import GAP, gen_walls_array
+from shapes import GAP, gen_walls_array, gen_walls_array_from_list
 from Alien import Alien
 from Human import Human
-import pickle
+import ast
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
@@ -51,9 +51,10 @@ screens = [human_screen, alien_screen]
 screen.fill((0, 0, 0))
 
 with open("board.txt",'r') as file:
-    file.write(str(board))
+    cellList = ast.literal_eval(file.read())
+    board, (start_alien, start_human) = gen_walls_array_from_list(cellList)
 
-board, (start_alien, start_human) = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
+# board, (start_alien, start_human) = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
 # with open("board.txt",'w') as file:
 #     file.write(str(board))
 

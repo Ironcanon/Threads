@@ -40,19 +40,27 @@ p2_camera = pygame.Rect(SCREEN_WIDTH/2,0,SCREEN_WIDTH/2,SCREEN_HEIGHT)
 human_screen = canvas.subsurface(p1_camera)
 alien_screen = canvas.subsurface(p2_camera)
 
-pygame.draw.line(alien_screen, (255,255,255), (0,0), (0,SCREEN_HEIGHT), 10)
+# pygame.draw.line(alien_screen, (255,255,255), (0,0), (0,SCREEN_HEIGHT), 10)
 
 screens = [human_screen, alien_screen]
 
 screen.fill((0, 0, 0))
 
+board = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
+print(board)
 walls = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 dirty_sprites = pygame.sprite.Group()
 
+for row in board:
+    for cell in row:
+        if cell.isWall:
+            walls.add(cell)
+        all_sprites.add(cell)
+
 for sub_screen in screens:
-    for wall in generate_maze(sub_screen.get_width(), sub_screen.get_height()):
-        all_sprites.add(wall)
+    # for wall in generate_maze(sub_screen.get_width(), sub_screen.get_height()):
+    #     all_sprites.add(wall)
 
     for entity in all_sprites:
         sub_screen.blit(entity.surf, entity.rect)

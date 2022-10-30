@@ -21,6 +21,7 @@ class Cell(pygame.sprite.Sprite):
         self.humanSight = False
         self.rect = self.surf.get_rect(center=(x*GAP+GAP/2, y*GAP+GAP/2))
         self.heat = heat
+        self.containsAlien = False
     
     def add_heat(self):
         self.heat = 255
@@ -37,6 +38,9 @@ class Cell(pygame.sprite.Sprite):
     
     def setSight(self, isSeen):
         self.humanSight = isSeen
+
+    def setAlien(self, hasAlien):
+        self.containsAlien = hasAlien
 
     def __repr__(self):
         return f"{1 if self.isWall else 0}"

@@ -22,8 +22,9 @@ class Alien(pygame.sprite.Sprite):
         self.moveDown = True
         self.moveLeft = True
         self.moveRight = True
+        self.currentCell = None
 
-    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, alienScreen):
+    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, alienScreen, cells):
         moveMade = False
         if keysPressed[K_UP] and self.moveUp:
             alienScreen.blit(self.replaceSurf, self.rect)
@@ -57,6 +58,13 @@ class Alien(pygame.sprite.Sprite):
             self.rect.bottom = SCREEN_HEIGHT
 
         alienScreen.blit(self.surf, self.rect)
+
+        if moveMade:
+            if (self.currentCell != None):
+                self.currentCell.setAlien(False)
+            self.currentCell = pygame.sprite.spritecollideany(self, cells)
+            self.currentCell.setAlien(True)
+
 
         return moveMade
 

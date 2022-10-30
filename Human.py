@@ -5,7 +5,8 @@ from pygame.locals import (
     K_a,
     K_s,
     K_d,
-    K_w
+    K_w,
+    K_SPACE
 )
 
 class Human(pygame.sprite.Sprite):
@@ -17,6 +18,8 @@ class Human(pygame.sprite.Sprite):
         self.replaceSurf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
         self.rect.move_ip(start)
+        self.item = "None"
+        self.cold_timer = 0
 
         self.lives = 3
 
@@ -29,8 +32,11 @@ class Human(pygame.sprite.Sprite):
         moveMade = False
         currentCell = pygame.sprite.spritecollideany(self, cells)
         if currentCell != None:
-            currentCell.add_heat()
-            heatedCells.add(currentCell)
+            if self.cold_timer == 0:
+                currentCell.add_heat()
+                heatedCells.add(currentCell)
+            else:
+                self.cold_timer -= 1
             alienScreen.blit(currentCell.surf, currentCell.rect)
 
         if keysPressed[K_w] and self.moveUp:
@@ -56,6 +62,9 @@ class Human(pygame.sprite.Sprite):
             self.rect.move_ip(5, 0)
             moveMade = True
             self.checkDirections(wallGroup)
+        if keysPressed[K_SPACE] and self.item == "extinguisher":
+            self.item == "None"
+            self.cold_timer = 1000
 
         # Keep player on the screen
         if self.rect.left < 0:

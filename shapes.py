@@ -10,8 +10,11 @@ class Cell(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.isWall = isWall
+        self.humanSight = False
         self.surf.fill((255,255,255) if isWall else (0,0,0))
         self.rect = self.surf.get_rect(center=(x*GAP+GAP/2, y*GAP+GAP/2))
+        self.humanSurf = pygame.Surface((GAP, GAP))
+        self.humanSurf.fill((255,255,255) if isWall else (0,0,0))
         self.heat = heat
     
     def add_heat(self):
@@ -26,6 +29,10 @@ class Cell(pygame.sprite.Sprite):
     def set_wall(self, isWall):
         self.isWall = isWall
         self.surf.fill((255,255,255) if isWall else (0,0,0))
+    
+    def setSight(self, isSeen):
+        self.humanSight = isSeen
+        self.humanSurf.fill((255, 222, 0) if isSeen else (0,0,0))
         
     def __repr__(self):
         return f"{1 if self.isWall else 0}"
@@ -48,9 +55,6 @@ def gen_walls_array(screen_width, screen_hight):
     walls[-2][rand_top].set_wall(False)
 
     return (walls, (rand_top, rand_bot))
-
-def gen_walls_array(string_board):
-    pass
 
 def gen_random_rooms(walls,num_width, num_hight, number_of_rooms, max_size, min_size=3):
     added_rooms = []

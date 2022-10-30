@@ -17,13 +17,34 @@ from pygame.locals import (
 # Initialize pygame
 pygame.init()
 
-# Define constants for the screen width and height
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-
 # Create the screen object
 # The size is determined by the constant SCREEN_WIDTH and SCREEN_HEIGHT
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+
+# Define constants for the screen width and height
+print(pygame.display.get_window_size())
+SCREEN_WIDTH = pygame.display.get_window_size()[0]
+SCREEN_HEIGHT = pygame.display.get_window_size()[1]
+
+print(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Camera rectangles for sections of  the canvas
+p1_camera = pygame.Rect(0,0,SCREEN_WIDTH/2,SCREEN_HEIGHT)
+p2_camera = pygame.Rect(SCREEN_WIDTH/2,0,SCREEN_WIDTH/2,SCREEN_HEIGHT)
+
+print(p1_camera.width, p1_camera.height)
+print(p2_camera.width, p2_camera.height)
+
+# subsurfaces of canvas
+# Note that subx needs refreshing when px_camera changes.
+human_screen = canvas.subsurface(p1_camera)
+alien_screen = canvas.subsurface(p2_camera)
+
+pygame.draw.line(alien_screen, (255,255,255), (0,0), (0,SCREEN_HEIGHT), 10)
+
+screens = [human_screen, alien_screen]
 
 screen.fill((0, 0, 0))
 
@@ -31,12 +52,17 @@ walls = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 dirty_sprites = pygame.sprite.Group()
 
-for wall in generate_maze(SCREEN_WIDTH, SCREEN_HEIGHT):
-    all_sprites.add(wall)
+for sub_screen in screens:
+    for wall in generate_maze(sub_screen.get_width(), sub_screen.get_height()):
+        all_sprites.add(wall)
 
-for entity in all_sprites:
-    screen.blit(entity.surf, entity.rect)
+    for entity in all_sprites:
+        sub_screen.blit(entity.surf, entity.rect)
 
+# draw player 1's view  to the top left corner
+screen.blit(human_screen, (0,0))
+# player 2's view is in the top right corner
+screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
 # Variable to keep the main loop running
 running = True
 

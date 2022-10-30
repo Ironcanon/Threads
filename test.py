@@ -1,6 +1,8 @@
 # Import the pygame module
 import pygame
 from shapes import generate_maze, gen_walls_array
+from Alien import Alien
+from Human import Human
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
@@ -26,7 +28,7 @@ print(pygame.display.get_window_size())
 SCREEN_WIDTH = pygame.display.get_window_size()[0]
 SCREEN_HEIGHT = pygame.display.get_window_size()[1]
 
-print(gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT))
+# print(gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT))
 
 canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -34,13 +36,14 @@ canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 p1_camera = pygame.Rect(0,0,SCREEN_WIDTH/2,SCREEN_HEIGHT)
 p2_camera = pygame.Rect(SCREEN_WIDTH/2,0,SCREEN_WIDTH/2,SCREEN_HEIGHT)
 
-
 # subsurfaces of canvas
 # Note that subx needs refreshing when px_camera changes.
 human_screen = canvas.subsurface(p1_camera)
 alien_screen = canvas.subsurface(p2_camera)
 
 # pygame.draw.line(alien_screen, (255,255,255), (0,0), (0,SCREEN_HEIGHT), 10)
+
+clock = pygame.time.Clock()
 
 screens = [human_screen, alien_screen]
 
@@ -51,17 +54,36 @@ board = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
 walls = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 dirty_sprites = pygame.sprite.Group()
+floor = pygame.sprite.Group()
+heated_cells = pygame.sprite.Group()
+
+def screen_blit(sprite):
+    human_screen.blit(sprite.surf, sprite.rect)
+    alien_screen.blit(sprite.surf, sprite.rect)
 
 for row in board:
     for cell in row:
         if cell.isWall:
             walls.add(cell)
+        else:
+            if(len(heated_cells) < 10):
+                cell.add_heat()
+                heated_cells.add(cell)
+            floor.add(cell)
+                
         all_sprites.add(cell)
+        
 
-for sub_screen in screens:
+for entity in all_sprites:
+    screen_blit(entity)
 
-    for entity in all_sprites:
-        sub_screen.blit(entity.getSurf(), entity.rect)
+alienPlayer = Alien()
+humanPlayer = Human()
+all_sprites.add(alienPlayer)
+all_sprites.add(humanPlayer)
+
+screens[0].blit(humanPlayer.surf, humanPlayer.rect)
+screens[1].blit(alienPlayer.surf, alienPlayer.rect)
 
 # draw player 1's view  to the top left corner
 screen.blit(human_screen, (0,0))
@@ -83,5 +105,28 @@ while running:
         # Did the user click the window close button? If so, stop the loop.
         elif event.type == QUIT:
             running = False
+    for cell in heated_cells:
+        cell.reduce_heat()
+        screen_blit(cell)
+        
+    # Get all the keys currently pressed
+    pressed_keys = pygame.key.get_pressed()
 
+    if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen):
+        # draw player 1's view  to the top left corner
+        screen.blit(human_screen, (0,0))
+    if alienPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, alien_screen):
+        screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
+    
+    # After the moves are made, check if the alien and human have collided, killing the human
+    human_screen.blit(alienPlayer.surf, alienPlayer.rect)
+    if pygame.sprite.collide_rect(humanPlayer, alienPlayer):
+        running = False
+    else:
+        human_screen.blit(alienPlayer.replaceSurf, alienPlayer.rect)
+        
+    screen.blit(human_screen, (0,0))
+    screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
+        
+    clock.tick(30)
     pygame.display.flip()

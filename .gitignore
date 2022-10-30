@@ -4,3 +4,6 @@ __pycache__/Player.cpython-311.pyc
 *.pyc
 *.pyc
 __pycache__/Wall.cpython-311.pyc
+__pycache__/shapes.cpython-311.pyc
+__pycache__/Player.cpython-311.pyc
+__pycache__/Wall.cpython-311.pyc

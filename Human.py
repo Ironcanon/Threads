@@ -1,4 +1,5 @@
 # Import the pygame module
+import math
 import pygame
 
 from pygame.locals import (
@@ -8,6 +9,7 @@ from pygame.locals import (
     K_w,
     K_SPACE
 )
+from shapes import GAP
 
 class Human(pygame.sprite.Sprite):
     def __init__(self, start):
@@ -30,7 +32,7 @@ class Human(pygame.sprite.Sprite):
         self.moveLeft = True
         self.moveRight = True
 
-    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen, alienScreen, cells, heatedCells, seenCells):
+    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen, alienScreen, cells, heatedCells, alienPlayer, seenCells):
         moveMade = False
         currentCell = pygame.sprite.spritecollideany(self, cells)
         if currentCell != None:
@@ -42,7 +44,8 @@ class Human(pygame.sprite.Sprite):
                 heatedCells.add(currentCell)
             else:
                 self.cold_timer -= 1
-            alienScreen.blit(currentCell.surf, currentCell.rect)
+            # if math.dist([currentCell.x, currentCell.y],[alienPlayer.rect.x, alienPlayer.rect.y]) < 5:
+            #     alienScreen.blit(currentCell.humanSurf, currentCell.rect)
 
         if keysPressed[K_w] and self.moveUp:
             humanScreen.blit(self.replaceSurf, self.rect)

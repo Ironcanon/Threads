@@ -1,4 +1,5 @@
 # Import the pygame module
+import math
 import sys
 import pygame
 from button import Button
@@ -167,15 +168,15 @@ def play():
 
         madeMove = False
 
-        if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen, alien_screen, floor, heated_cells, seenCells):
+        if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen, alien_screen, floor, heated_cells, alienPlayer, seenCells):
             madeMove = True
 
         if alienPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, alien_screen):
             madeMove = True
         
-        if madeMove:
-            screen.blit(human_screen, (0,0))
-            screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
+        # if madeMove:
+        screen.blit(human_screen, (0,0))
+        screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
             
         if(humanPlayer.win):
             win("Astronaut Wins!")

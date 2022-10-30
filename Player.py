@@ -9,26 +9,36 @@ from pygame.locals import (
 )
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, startX, startY):
         super(Player, self).__init__()
-        self.surf = pygame.Surface((25, 25))
-        self.surf.fill((255, 255, 255))
+        self.surf = pygame.Surface((10, 10))
+        self.surf.fill((0, 255, 0))
         self.rect = self.surf.get_rect()
+        self.rect.move_ip(startX, startY)
+
+        self.moveUp = True
+        self.moveDown = True
+        self.moveLeft = True
+        self.moveRight = True
 
     def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup):
         moveMade = False
-        if keysPressed[K_UP]:
+        if keysPressed[K_UP] and self.moveUp:
             self.rect.move_ip(0, -5)
             moveMade = True
-        if keysPressed[K_DOWN]:
+            self.checkDirections(wallGroup)
+        if keysPressed[K_DOWN] and self.moveDown:
             self.rect.move_ip(0, 5)
             moveMade = True
-        if keysPressed[K_LEFT]:
+            self.checkDirections(wallGroup)
+        if keysPressed[K_LEFT] and self.moveLeft:
             self.rect.move_ip(-5, 0)
             moveMade = True
-        if keysPressed[K_RIGHT]:
+            self.checkDirections(wallGroup)
+        if keysPressed[K_RIGHT] and self.moveRight:
             self.rect.move_ip(5, 0)
             moveMade = True
+            self.checkDirections(wallGroup)
 
         # Keep player on the screen
         if self.rect.left < 0:
@@ -40,44 +50,27 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
 
-        collidedSprite = pygame.sprite.spritecollideany(self, wallGroup)
-
-        while (collidedSprite != None):
-
-            directionDistances = []
-
-            directionDistances.append(self.rect.bottom - collidedSprite.rect.top)
-            directionDistances.append(collidedSprite.rect.bottom - self.rect.top)
-            directionDistances.append(self.rect.right - collidedSprite.rect.left)
-            directionDistances.append(collidedSprite.rect.right - self.rect.left)
-
-            largestValue = directionDistances[0]
-            largestDirectionIndex = 0
-            equalDistance = -1
-
-            for i in range(1, 4):
-                if directionDistances[i] > largestValue:
-                    largestValue = directionDistances[i]
-                    largestDirectionIndex = i
-                    equalDistance = -1
-                elif directionDistances[i] == largestValue:
-                    equalDistance = i
-
-            if largestDirectionIndex == 0 or equalDistance == 0:
-                self.rect.top = collidedSprite.rect.bottom
-            if largestDirectionIndex == 1 or equalDistance == 1:
-                self.rect.bottom = collidedSprite.rect.top
-            if largestDirectionIndex == 2 or equalDistance == 2:
-                self.rect.left = collidedSprite.rect.right
-            if largestDirectionIndex == 3 or equalDistance == 3:
-                self.rect.right = collidedSprite.rect.left
-
-            collidedSprite = pygame.sprite.spritecollideany(self, wallGroup)
-
-
-            
-
-        
-
-        
         return moveMade
+
+    def checkDirections(self, wallGroup):
+            self.rect.move_ip(0, -5)
+            if pygame.sprite.spritecollideany(self, wallGroup) != None:
+                self.moveUp = False
+            else:
+                self.moveUp = True
+            self.rect.move_ip(0, 10)
+            if pygame.sprite.spritecollideany(self, wallGroup) != None:
+                self.moveDown = False
+            else:
+                self.moveDown = True
+            self.rect.move_ip(-5, -5)
+            if pygame.sprite.spritecollideany(self, wallGroup) != None:
+                self.moveLeft = False
+            else:
+                self.moveLeft = True
+            self.rect.move_ip(10, 0)
+            if pygame.sprite.spritecollideany(self, wallGroup) != None:
+                self.moveRight = False
+            else:
+                self.moveRight = True       
+            self.rect.move_ip(-5, 0)     

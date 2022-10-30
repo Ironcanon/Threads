@@ -32,7 +32,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # Variable to keep the main loop running
 running = True
 
-player = Player()
+player = Player(0, 0)
 testWall = Wall(400, 400)
 testWall2 = Wall(200, 200)
 screen.blit(testWall.surf, (400, 400))

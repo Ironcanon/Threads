@@ -1,6 +1,6 @@
 import pygame
 
-GAP = 30
+GAP = 20
 
 class Wall(pygame.sprite.Sprite):
     def __init__(self, width, hight, x, y,colour=(255,255,255)):
@@ -8,6 +8,13 @@ class Wall(pygame.sprite.Sprite):
         self.surf = pygame.Surface((width, hight))
         self.surf.fill(colour)
         self.rect = self.surf.get_rect(center=(x+width/2, y+hight/2))
+
+class Cell(pygame.sprite.Sprite):
+    def __init__(self, x, y, isWall=False, heat=0):
+        super(Cell, self).__init__()
+        self.surf = pygame.Surface((GAP, GAP))
+        self.surf.fill((255,255,255) if isWall else (0,0,0))
+        self.rect = self.surf.get_rect(center=(x+GAP/2, y+GAP/2))
 
 def generate_maze(width, hight):
     walls = []
@@ -42,3 +49,9 @@ def room(x1,y1,x2,y2,door_x,door_y):
     walls.append(Wall(x2-x1, GAP, x1, y2-GAP))
     walls.append(Wall(GAP, GAP, door_x, door_y, colour=(0,0,0)))
     return walls
+
+def gen_walls_array(screen_width, screen_hight):
+    num_width = screen_width//(GAP*2)
+    num_hight = screen_hight//(GAP)
+    walls = [[Cell(x,y,isWall=(x == 0 or x == num_width-1 or y == 0 or y == num_hight-1)) for x in range(num_width)] for y in range(num_hight)]
+    print(walls)

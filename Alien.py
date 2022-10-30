@@ -9,7 +9,7 @@ from pygame.locals import (
 
 class Alien(pygame.sprite.Sprite):
     def __init__(self, start):
-        size = 30
+        size = 28
         super(Alien, self).__init__()
         image = pygame.image.load("assets/Alien.png").convert()
         self.surf = pygame.transform.scale(image, (size, size))
@@ -28,22 +28,22 @@ class Alien(pygame.sprite.Sprite):
         moveMade = False
         if keysPressed[K_UP] and self.moveUp:
             alienScreen.blit(self.replaceSurf, self.rect)
-            self.rect.move_ip(0, -5)
+            self.rect.move_ip(0, -3)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_DOWN] and self.moveDown:
             alienScreen.blit(self.replaceSurf, self.rect)
-            self.rect.move_ip(0, 5)
+            self.rect.move_ip(0, 3)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_LEFT] and self.moveLeft:
             alienScreen.blit(self.replaceSurf, self.rect)            
-            self.rect.move_ip(-5, 0)
+            self.rect.move_ip(-3, 0)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_RIGHT] and self.moveRight:
             alienScreen.blit(self.replaceSurf, self.rect)
-            self.rect.move_ip(5, 0)
+            self.rect.move_ip(3, 0)
             moveMade = True
             self.checkDirections(wallGroup)
 

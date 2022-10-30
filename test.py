@@ -101,7 +101,7 @@ def main_menu():
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
-        MENU_TEXT = get_font(100).render("MAIN MENU", True, "#b68f40")
+        MENU_TEXT = get_font(100).render("ASTRO VS PRED", True, "#b68f40")
         MENU_RECT = MENU_TEXT.get_rect(center=(SCREEN_WIDTH/2, 100))
 
         PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(SCREEN_WIDTH/2, 250), 
@@ -176,7 +176,9 @@ def play():
             cell.reduce_heat()
             if cell.heat == 0:
                 coldCells.append(cell)
-            screen_blit(cell)
+            print(math.dist([cell.x, cell.y],[alienPlayer.rect.x//GAP, alienPlayer.rect.y//GAP]))
+            if math.dist([cell.x, cell.y],[alienPlayer.rect.x//GAP, alienPlayer.rect.y//GAP]) < 10:
+                screen_blit(cell)
         for currentCell in coldCells:
             heated_cells.remove(currentCell)
             

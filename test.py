@@ -1,6 +1,6 @@
 # Import the pygame module
 import pygame
-from shapes import generate_maze, gen_walls_array
+from shapes import GAP, Cell, generate_maze, gen_walls_array
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
@@ -26,7 +26,7 @@ print(pygame.display.get_window_size())
 SCREEN_WIDTH = pygame.display.get_window_size()[0]
 SCREEN_HEIGHT = pygame.display.get_window_size()[1]
 
-print(gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT))
+# print(gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT))
 
 canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -47,23 +47,32 @@ screens = [human_screen, alien_screen]
 screen.fill((0, 0, 0))
 
 board = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
-print(board)
+# print(board)
 walls = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 dirty_sprites = pygame.sprite.Group()
+floor = pygame.sprite.Group()
+heated_cells = pygame.sprite.Group()
+
+def screen_blit(sprite):
+    human_screen.blit(sprite.surf, sprite.rect)
+    alien_screen.blit(sprite.surf, sprite.rect)
 
 for row in board:
     for cell in row:
         if cell.isWall:
             walls.add(cell)
+        else:
+            if(len(heated_cells) < 10):
+                cell.add_heat()
+                heated_cells.add(cell)
+            floor.add(cell)
+                
         all_sprites.add(cell)
+        
 
-for sub_screen in screens:
-    # for wall in generate_maze(sub_screen.get_width(), sub_screen.get_height()):
-    #     all_sprites.add(wall)
-
-    for entity in all_sprites:
-        sub_screen.blit(entity.surf, entity.rect)
+for entity in all_sprites:
+    screen_blit(entity)
 
 # draw player 1's view  to the top left corner
 screen.blit(human_screen, (0,0))
@@ -85,5 +94,11 @@ while running:
         # Did the user click the window close button? If so, stop the loop.
         elif event.type == QUIT:
             running = False
-
+    for cell in heated_cells:
+        cell.reduce_heat()
+        screen_blit(cell)
+        
+    screen.blit(human_screen, (0,0))
+    screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
+        
     pygame.display.flip()

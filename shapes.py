@@ -17,19 +17,18 @@ class Cell(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.isWall = isWall
-        self.heat = heat
         self.surf.fill((255,255,255) if isWall else (0,0,0))
         self.rect = self.surf.get_rect(center=(x*GAP+GAP/2, y*GAP+GAP/2))
         self.heat = heat
     
     def add_heat(self):
-        self.heat = 1
-        self.surf.fill((255, 0, 0, 1))
+        self.heat = 255
+        self.surf.fill((255, 0, 0))
         
     def reduce_heat(self):
         if self.heat > 0:
-            self.heat-=1
-            self.surf.set_alpha(self.heat) 
+            self.heat-=0.25
+            self.surf.fill((self.heat, 0, 0))
         
         
     def __repr__(self):

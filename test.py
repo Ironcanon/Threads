@@ -180,10 +180,15 @@ def play():
         if(humanPlayer.win):
             win("Astronaut Wins!")
             return
-        elif(alienPlayer.win):
+
+        # After the moves are made, check if the alien and human have collided, killing the human
+        human_screen.blit(alienPlayer.surf, alienPlayer.rect)
+        if pygame.sprite.collide_rect(humanPlayer, alienPlayer):
             win("Alien Wins!")
             return
-            
+        else:
+            human_screen.blit(alienPlayer.replaceSurf, alienPlayer.rect)
+
         clock.tick(30)
         pygame.display.flip()
     

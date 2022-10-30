@@ -23,7 +23,7 @@ class Cell(pygame.sprite.Sprite):
         
     def reduce_heat(self):
         if self.heat > 0:
-            self.heat-=1
+            self.heat-=3
             self.surf.fill((self.heat, 0, 0))
 
     def set_wall(self, isWall):

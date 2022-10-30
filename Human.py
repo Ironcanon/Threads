@@ -31,27 +31,28 @@ class Human(pygame.sprite.Sprite):
         if currentCell != None:
             currentCell.add_heat()
             heatedCells.add(currentCell)
+            alienScreen.blit(currentCell.surf, currentCell.rect)
+
         if keysPressed[K_w] and self.moveUp:
             humanScreen.blit(self.replaceSurf, self.rect)
-            alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(0, -5)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_s] and self.moveDown:
             humanScreen.blit(self.replaceSurf, self.rect)
-            alienScreen.blit(currentCell.surf, currentCell.rect)
+            # alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(0, 5)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_a] and self.moveLeft:
             humanScreen.blit(self.replaceSurf, self.rect)
-            alienScreen.blit(currentCell.surf, currentCell.rect)
+            # alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(-5, 0)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_d] and self.moveRight:
             humanScreen.blit(self.replaceSurf, self.rect)
-            alienScreen.blit(currentCell.surf, currentCell.rect)
+            # alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(5, 0)
             moveMade = True
             self.checkDirections(wallGroup)

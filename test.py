@@ -64,6 +64,7 @@ dirty_sprites = pygame.sprite.Group()
 floor = pygame.sprite.Group()
 heated_cells = pygame.sprite.Group()
 seenCells = pygame.sprite.Group()
+interactables = pygame.sprite.Group()
 
 def screen_blit(sprite):
     human_screen.blit(sprite.humanSurf, sprite.rect)

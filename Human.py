@@ -9,7 +9,7 @@ from pygame.locals import (
 )
 
 class Human(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, start):
         size = 30
         super(Human, self).__init__()
         image = pygame.image.load("assets/Astronaut.png").convert()
@@ -17,7 +17,7 @@ class Human(pygame.sprite.Sprite):
         self.replaceSurf = pygame.Surface((size, size))
         self.replaceSurf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
-        self.rect.move_ip(100, 100)
+        self.rect.move_ip(start)
 
         self.lives = 3
 
@@ -26,8 +26,14 @@ class Human(pygame.sprite.Sprite):
         self.moveLeft = True
         self.moveRight = True
 
-    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen):
+    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen, alienScreen, cells, heatedCells, seenCells):
         moveMade = False
+        currentCell = pygame.sprite.spritecollideany(self, cells)
+        if currentCell != None:
+            currentCell.add_heat()
+            heatedCells.add(currentCell)
+            alienScreen.blit(currentCell.surf, currentCell.rect)
+
         if keysPressed[K_w] and self.moveUp:
             humanScreen.blit(self.replaceSurf, self.rect)
             self.rect.move_ip(0, -5)
@@ -35,16 +41,19 @@ class Human(pygame.sprite.Sprite):
             self.checkDirections(wallGroup)
         if keysPressed[K_s] and self.moveDown:
             humanScreen.blit(self.replaceSurf, self.rect)
+            # alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(0, 5)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_a] and self.moveLeft:
             humanScreen.blit(self.replaceSurf, self.rect)
+            # alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(-5, 0)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_d] and self.moveRight:
             humanScreen.blit(self.replaceSurf, self.rect)
+            # alienScreen.blit(currentCell.surf, currentCell.rect)
             self.rect.move_ip(5, 0)
             moveMade = True
             self.checkDirections(wallGroup)

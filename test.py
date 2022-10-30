@@ -2,9 +2,10 @@
 import sys
 import pygame
 from button import Button
-from shapes import generate_maze, gen_walls_array
+from shapes import GAP, gen_walls_array, gen_walls_array_from_list
 from Alien import Alien
 from Human import Human
+import ast
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
@@ -54,46 +55,25 @@ screens = [human_screen, alien_screen]
 
 screen.fill((0, 0, 0))
 
-board = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
-# print(board)
+with open("board.txt",'r') as file:
+    cellList = ast.literal_eval(file.read())
+    board, (start_alien, start_human) = gen_walls_array_from_list(cellList)
+
+# board, (start_alien, start_human) = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
+# with open("board.txt",'w') as file:
+#     file.write(str(board))
+
 walls = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 dirty_sprites = pygame.sprite.Group()
 floor = pygame.sprite.Group()
 heated_cells = pygame.sprite.Group()
+seenCells = pygame.sprite.Group()
+interactables = pygame.sprite.Group()
 
 def screen_blit(sprite):
-    human_screen.blit(sprite.surf, sprite.rect)
+    human_screen.blit(sprite.humanSurf, sprite.rect)
     alien_screen.blit(sprite.surf, sprite.rect)
-
-for row in board:
-    for cell in row:
-        if cell.isWall:
-            walls.add(cell)
-        else:
-            if(len(heated_cells) < 10):
-                cell.add_heat()
-                heated_cells.add(cell)
-            floor.add(cell)
-                
-        all_sprites.add(cell)
-        
-
-for entity in all_sprites:
-    screen_blit(entity)
-
-alienPlayer = Alien()
-humanPlayer = Human()
-all_sprites.add(alienPlayer)
-all_sprites.add(humanPlayer)
-
-screens[0].blit(humanPlayer.surf, humanPlayer.rect)
-screens[1].blit(alienPlayer.surf, alienPlayer.rect)
-
-# draw player 1's view  to the top left corner
-screen.blit(human_screen, (0,0))
-# player 2's view is in the top right corner
-screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
 
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("assets/font.ttf", size)
@@ -136,6 +116,30 @@ def main_menu():
         pygame.display.update()
 
 def play():
+    for row in board:
+        for cell in row:
+            if cell.isWall:
+                walls.add(cell)
+            else:
+                floor.add(cell)
+                    
+            all_sprites.add(cell)
+
+    for entity in all_sprites:
+        screen_blit(entity)
+
+    alienPlayer = Alien((GAP*start_alien, 0))
+    humanPlayer = Human((GAP*start_human, SCREEN_HEIGHT))
+    all_sprites.add(alienPlayer)
+    all_sprites.add(humanPlayer)
+
+    screens[0].blit(humanPlayer.surf, humanPlayer.rect)
+    screens[1].blit(alienPlayer.surf, alienPlayer.rect)
+
+    # draw player 1's view  to the top left corner
+    screen.blit(human_screen, (0,0))
+    # player 2's view is in the top right corner
+    screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
     # Variable to keep the main loop running
     running = True
     # Main loop
@@ -147,33 +151,34 @@ def play():
                 # Was it the Escape key? If so, stop the loop.
                 if event.key == K_ESCAPE:
                     running = False
-
             # Did the user click the window close button? If so, stop the loop.
             elif event.type == QUIT:
                 running = False
+        coldCells = []
         for cell in heated_cells:
             cell.reduce_heat()
+            if cell.heat == 0:
+                coldCells.append(cell)
             screen_blit(cell)
+        for currentCell in coldCells:
+            heated_cells.remove(currentCell)
             
         # Get all the keys currently pressed
         pressed_keys = pygame.key.get_pressed()
 
-        if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen):
-            # draw player 1's view  to the top left corner
-            screen.blit(human_screen, (0,0))
+        madeMove = False
+
+        if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen, alien_screen, floor, heated_cells, seenCells):
+            madeMove = True
+
         if alienPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, alien_screen):
-            screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
+            madeMove = True
         
-        # After the moves are made, check if the alien and human have collided, killing the human
-        human_screen.blit(alienPlayer.surf, alienPlayer.rect)
-        if pygame.sprite.collide_rect(humanPlayer, alienPlayer):
-            running = False
-        else:
-            human_screen.blit(alienPlayer.replaceSurf, alienPlayer.rect)
+        if madeMove:
+            screen.blit(human_screen, (0,0))
+            screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
             
-        screen.blit(human_screen, (0,0))
-        screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
-            
+        print("yooo")
         clock.tick(30)
         pygame.display.flip()
     

@@ -8,7 +8,7 @@ from pygame.locals import (
 )
 
 class Alien(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, start):
         size = 30
         super(Alien, self).__init__()
         image = pygame.image.load("assets/Alien.png").convert()
@@ -16,7 +16,7 @@ class Alien(pygame.sprite.Sprite):
         self.replaceSurf = pygame.Surface((size, size))
         self.replaceSurf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
-        self.rect.move_ip(400, 400)
+        self.rect.move_ip(start)
 
         self.moveUp = True
         self.moveDown = True

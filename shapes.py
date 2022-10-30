@@ -1,7 +1,7 @@
 from random import randint
 import pygame
 
-GAP = 20
+GAP = 30
 
 class Wall(pygame.sprite.Sprite):
     def __init__(self, width, hight, x, y,colour=(255,255,255)):
@@ -13,11 +13,13 @@ class Wall(pygame.sprite.Sprite):
 class Cell(pygame.sprite.Sprite):
     def __init__(self, x, y, isWall=False, heat=0):
         super(Cell, self).__init__()
-        self.surf = pygame.Surface((GAP, GAP))
+        image = pygame.image.load("assets/Wall.jpg").convert()
+        self.surf = pygame.transform.scale(image, (GAP, GAP))
         self.x = x
         self.y = y
         self.isWall = isWall
-        self.surf.fill((255,255,255) if isWall else (0,0,0))
+        if(not self.isWall):
+            self.surf.fill((0,0,0))
         self.rect = self.surf.get_rect(center=(x*GAP+GAP/2, y*GAP+GAP/2))
         self.heat = heat
     

@@ -177,8 +177,11 @@ def play():
             screen.blit(human_screen, (0,0))
             screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
             
-        if(True):
+        if(humanPlayer.win):
             win("Astronaut Wins!")
+            return
+        elif(alienPlayer.win):
+            win("Alien Wins!")
             return
             
         clock.tick(30)

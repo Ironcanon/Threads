@@ -18,7 +18,7 @@ from pygame.locals import (
 pygame.init()
 
 # Define constants for the screen width and height
-SCREEN_WIDTH = 800
+SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 600
 
 # Create the screen object
@@ -53,5 +53,5 @@ while running:
         # Did the user click the window close button? If so, stop the loop.
         elif event.type == QUIT:
             running = False
-            
+
     pygame.display.flip()

@@ -1,3 +1,4 @@
+from random import randint
 import pygame
 
 GAP = 20
@@ -7,14 +8,22 @@ class Wall(pygame.sprite.Sprite):
         super(Wall, self).__init__()
         self.surf = pygame.Surface((width, hight))
         self.surf.fill(colour)
-        self.rect = self.surf.get_rect(center=(x+width/2, y+hight/2))
+        self.rect = self.surf.get_rect(center=(x*GAP+width/2, y*GAP+hight/2))
 
 class Cell(pygame.sprite.Sprite):
     def __init__(self, x, y, isWall=False, heat=0):
         super(Cell, self).__init__()
         self.surf = pygame.Surface((GAP, GAP))
         self.surf.fill((255,255,255) if isWall else (0,0,0))
-        self.rect = self.surf.get_rect(center=(x+GAP/2, y+GAP/2))
+        self.rect = self.surf.get_rect(center=(x*GAP+GAP/2, y*GAP+GAP/2))
+        self.x = x
+        self.y = y
+        self.isWall = isWall
+        self.heat = heat
+    def __repr__(self):
+        return f"{self.rect} {self.isWall} {self.heat}\n"
+    def __str__(self):
+        return f"{self.x} {self.y} {self.isWall} {self.heat}"
 
 def generate_maze(width, hight):
     walls = []
@@ -54,4 +63,6 @@ def gen_walls_array(screen_width, screen_hight):
     num_width = screen_width//(GAP*2)
     num_hight = screen_hight//(GAP)
     walls = [[Cell(x,y,isWall=(x == 0 or x == num_width-1 or y == 0 or y == num_hight-1)) for x in range(num_width)] for y in range(num_hight)]
-    print(walls)
+    walls[0][randint(0, len(walls[0])-1)].isWall = False
+    walls[-1][randint(0, len(walls[0])-1)].isWall = False
+    return walls

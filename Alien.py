@@ -8,14 +8,14 @@ from pygame.locals import (
 )
 
 class Alien(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, start):
         super(Alien, self).__init__()
         self.surf = pygame.Surface((15, 15))
         self.replaceSurf = pygame.Surface((15, 15))
         self.surf.fill((255, 0, 0))
         self.replaceSurf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
-        self.rect.move_ip(400, 400)
+        self.rect.move_ip(start)
 
         self.moveUp = True
         self.moveDown = True

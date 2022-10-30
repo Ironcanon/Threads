@@ -9,14 +9,14 @@ from pygame.locals import (
 )
 
 class Human(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, start):
         super(Human, self).__init__()
         self.surf = pygame.Surface((10, 10))
         self.replaceSurf = pygame.Surface((10, 10))
         self.surf.fill((0, 255, 0))
         self.replaceSurf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
-        self.rect.move_ip(100, 100)
+        self.rect.move_ip(start)
 
         self.lives = 3
 

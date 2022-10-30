@@ -4,19 +4,20 @@ import pygame
 GAP = 30
 
 class Cell(pygame.sprite.Sprite):
-    def __init__(self, x, y, isWall=False, heat=0):
+    def __init__(self, x, y, isWall=False, heat=0, isFinish=False):
         super(Cell, self).__init__()
         image = pygame.image.load("assets/Wall.jpg").convert()
         self.surf = pygame.transform.scale(image, (GAP, GAP))
+        self.humanSurf = pygame.transform.scale(image, (GAP, GAP))
         self.x = x
         self.y = y
         self.isWall = isWall
+        self.isFinish = isFinish
         if(not self.isWall):
             self.surf.fill((0,0,0))
+            self.humanSurf.fill((0,0,0))
         self.humanSight = False
         self.rect = self.surf.get_rect(center=(x*GAP+GAP/2, y*GAP+GAP/2))
-        self.humanSurf = pygame.Surface((GAP, GAP))
-        self.humanSurf.fill((255,255,255) if isWall else (0,0,0))
         self.heat = heat
     
     def add_heat(self):
@@ -65,6 +66,7 @@ def gen_walls_array_from_list(board):
         for x, val in enumerate(line):
             cells.append(Cell(x, y, val))
         walls.append(cells)
+    walls[0][board[0].index(0)].isFinish = True
     return (walls, (board[0].index(0), board[-1].index(0)))
 
 def gen_random_rooms(walls,num_width, num_hight, number_of_rooms, max_size, min_size=3):

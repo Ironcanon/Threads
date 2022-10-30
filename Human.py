@@ -11,7 +11,7 @@ from pygame.locals import (
 
 class Human(pygame.sprite.Sprite):
     def __init__(self, start):
-        size = 30
+        size = 29
         super(Human, self).__init__()
         image = pygame.image.load("assets/Astronaut.png").convert()
         self.surf = pygame.transform.scale(image, (size, size))
@@ -33,6 +33,8 @@ class Human(pygame.sprite.Sprite):
         moveMade = False
         currentCell = pygame.sprite.spritecollideany(self, cells)
         if currentCell != None:
+            if currentCell.isFinish:
+                print("Win")
             if self.cold_timer == 0:
                 currentCell.add_heat()
                 heatedCells.add(currentCell)

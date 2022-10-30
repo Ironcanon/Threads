@@ -1,2 +1,6 @@
 __pycache__
 *.pyc
+__pycache__/Player.cpython-311.pyc
+*.pyc
+*.pyc
+__pycache__/Wall.cpython-311.pyc

@@ -1,6 +1,6 @@
 # Import the pygame module
 import pygame
-from shapes import generate_maze
+from shapes import generate_maze, gen_walls_array
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
@@ -26,7 +26,7 @@ print(pygame.display.get_window_size())
 SCREEN_WIDTH = pygame.display.get_window_size()[0]
 SCREEN_HEIGHT = pygame.display.get_window_size()[1]
 
-print(SCREEN_WIDTH, SCREEN_HEIGHT)
+print(gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT))
 
 canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -34,8 +34,6 @@ canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 p1_camera = pygame.Rect(0,0,SCREEN_WIDTH/2,SCREEN_HEIGHT)
 p2_camera = pygame.Rect(SCREEN_WIDTH/2,0,SCREEN_WIDTH/2,SCREEN_HEIGHT)
 
-print(p1_camera.width, p1_camera.height)
-print(p2_camera.width, p2_camera.height)
 
 # subsurfaces of canvas
 # Note that subx needs refreshing when px_camera changes.

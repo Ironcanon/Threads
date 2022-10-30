@@ -2,40 +2,48 @@
 import pygame
 
 from pygame.locals import (
-    K_UP,
-    K_DOWN,
-    K_LEFT,
-    K_RIGHT
+    K_a,
+    K_s,
+    K_d,
+    K_w
 )
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, startX, startY):
-        super(Player, self).__init__()
+class Human(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Human, self).__init__()
         self.surf = pygame.Surface((10, 10))
+        self.replaceSurf = pygame.Surface((10, 10))
         self.surf.fill((0, 255, 0))
+        self.replaceSurf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
-        self.rect.move_ip(startX, startY)
+        self.rect.move_ip(100, 100)
+
+        self.lives = 3
 
         self.moveUp = True
         self.moveDown = True
         self.moveLeft = True
         self.moveRight = True
 
-    def update(self, keyFlags, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup):
+    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen):
         moveMade = False
-        if keysPressed[keyFlags[0]] and self.moveUp:
+        if keysPressed[K_w] and self.moveUp:
+            humanScreen.blit(self.replaceSurf, self.rect)
             self.rect.move_ip(0, -5)
             moveMade = True
             self.checkDirections(wallGroup)
-        if keysPressed[keyFlags[1]] and self.moveDown:
+        if keysPressed[K_s] and self.moveDown:
+            humanScreen.blit(self.replaceSurf, self.rect)
             self.rect.move_ip(0, 5)
             moveMade = True
             self.checkDirections(wallGroup)
-        if keysPressed[keyFlags[2]] and self.moveLeft:
+        if keysPressed[K_a] and self.moveLeft:
+            humanScreen.blit(self.replaceSurf, self.rect)
             self.rect.move_ip(-5, 0)
             moveMade = True
             self.checkDirections(wallGroup)
-        if keysPressed[keyFlags[3]] and self.moveRight:
+        if keysPressed[K_d] and self.moveRight:
+            humanScreen.blit(self.replaceSurf, self.rect)
             self.rect.move_ip(5, 0)
             moveMade = True
             self.checkDirections(wallGroup)
@@ -49,6 +57,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
+
+        humanScreen.blit(self.surf, self.rect)
 
         return moveMade
 
@@ -73,4 +83,6 @@ class Player(pygame.sprite.Sprite):
                 self.moveRight = False
             else:
                 self.moveRight = True       
-            self.rect.move_ip(-5, 0)     
+            self.rect.move_ip(-5, 0)  
+
+        

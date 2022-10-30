@@ -27,7 +27,7 @@ class Cell(pygame.sprite.Sprite):
         
     def reduce_heat(self):
         if self.heat > 0:
-            self.heat-=0.25
+            self.heat-=1
             self.surf.fill((self.heat, 0, 0))
         
         

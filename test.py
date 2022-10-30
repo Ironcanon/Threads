@@ -1,6 +1,8 @@
 # Import the pygame module
 import pygame
-from shapes import GAP, Cell, generate_maze, gen_walls_array
+from shapes import generate_maze, gen_walls_array
+from Alien import Alien
+from Human import Human
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
@@ -34,13 +36,14 @@ canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 p1_camera = pygame.Rect(0,0,SCREEN_WIDTH/2,SCREEN_HEIGHT)
 p2_camera = pygame.Rect(SCREEN_WIDTH/2,0,SCREEN_WIDTH/2,SCREEN_HEIGHT)
 
-
 # subsurfaces of canvas
 # Note that subx needs refreshing when px_camera changes.
 human_screen = canvas.subsurface(p1_camera)
 alien_screen = canvas.subsurface(p2_camera)
 
 # pygame.draw.line(alien_screen, (255,255,255), (0,0), (0,SCREEN_HEIGHT), 10)
+
+clock = pygame.time.Clock()
 
 screens = [human_screen, alien_screen]
 
@@ -74,6 +77,14 @@ for row in board:
 for entity in all_sprites:
     screen_blit(entity)
 
+alienPlayer = Alien()
+humanPlayer = Human()
+all_sprites.add(alienPlayer)
+all_sprites.add(humanPlayer)
+
+screens[0].blit(humanPlayer.surf, humanPlayer.rect)
+screens[1].blit(alienPlayer.surf, alienPlayer.rect)
+
 # draw player 1's view  to the top left corner
 screen.blit(human_screen, (0,0))
 # player 2's view is in the top right corner
@@ -98,7 +109,24 @@ while running:
         cell.reduce_heat()
         screen_blit(cell)
         
+    # Get all the keys currently pressed
+    pressed_keys = pygame.key.get_pressed()
+
+    if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen):
+        # draw player 1's view  to the top left corner
+        screen.blit(human_screen, (0,0))
+    if alienPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, alien_screen):
+        screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
+    
+    # After the moves are made, check if the alien and human have collided, killing the human
+    human_screen.blit(alienPlayer.surf, alienPlayer.rect)
+    if pygame.sprite.collide_rect(humanPlayer, alienPlayer):
+        running = False
+    else:
+        human_screen.blit(alienPlayer.replaceSurf, alienPlayer.rect)
+        
     screen.blit(human_screen, (0,0))
     screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
         
+    clock.tick(30)
     pygame.display.flip()

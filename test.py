@@ -82,7 +82,22 @@ def get_font(size): # Returns Press-Start-2P in the desired size
 
 def main_menu():
     while True:
-        screen.blit(BG, (0, 0))
+        for event in pygame.event.get():
+            screen.blit(BG, (0, 0))
+            # Did the user click the window close button? If so, stop the loop.
+            if event.type == QUIT:
+                running = False
+        coldCells = []
+        for cell in heated_cells:
+            cell.reduce_heat()
+            if cell.heat == 0:
+                coldCells.append(cell)
+            screen_blit(cell)
+        for currentCell in coldCells:
+            heated_cells.remove(currentCell)
+
+        # Get all the keys currently pressed
+        pressed_keys = pygame.key.get_pressed()
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -102,18 +117,20 @@ def main_menu():
             button.changeColor(MENU_MOUSE_POS)
             button.update(screen)
         
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    play()
-                if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        play()
+                    if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pass
+                    if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pygame.quit()
+                        sys.exit()
 
-        pygame.display.update()
+            pygame.display.update()
 
 def play():
     for row in board:

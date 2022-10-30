@@ -31,8 +31,10 @@ class Human(pygame.sprite.Sprite):
         self.moveDown = True
         self.moveLeft = True
         self.moveRight = True
+        self.currentCell = None
 
-    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen, alienScreen, cells, heatedCells, alienPlayer, seenCells):
+    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen, alienScreen, cells, heatedCells, seenCells):
+
         moveMade = False
         currentCell = pygame.sprite.spritecollideany(self, cells)
         if currentCell != None:
@@ -84,8 +86,88 @@ class Human(pygame.sprite.Sprite):
         if self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
 
-        humanScreen.blit(self.surf, self.rect)
 
+
+        if moveMade:
+            seeCellsToRemove = []
+            for cell in seenCells:
+                cell.setSight(False)
+                seeCellsToRemove.append(cell)
+                humanScreen.blit(cell.humanSurf, cell.rect)
+            for cell in seeCellsToRemove:
+                seenCells.remove(cell)
+
+            #Look up
+            yOffset = 30
+            self.rect.move_ip(0, -30)
+            currentLook = pygame.sprite.spritecollideany(self, cells)
+            isWall = pygame.sprite.spritecollideany(self, wallGroup)
+            while currentLook != None and self.rect.top >= 0 and isWall == None:
+                currentLook.setSight(True)
+                humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
+                seenCells.add(currentLook)
+                self.rect.move_ip(0, -30)
+                yOffset+=30
+                currentLook = pygame.sprite.spritecollideany(self, cells)
+                isWall = pygame.sprite.spritecollideany(self, wallGroup)
+
+            self.rect.move_ip(0, yOffset)
+
+            yOffset = -30
+            self.rect.move_ip(0, 30)
+
+            #Look down
+
+            currentLook = pygame.sprite.spritecollideany(self, cells)
+            isWall = pygame.sprite.spritecollideany(self, wallGroup)
+            while currentLook != None and self.rect.bottom <= SCREEN_HEIGHT and isWall == None:
+                currentLook.setSight(True)
+                humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
+                seenCells.add(currentLook)
+                self.rect.move_ip(0, 30)
+                yOffset += -30
+                currentLook = pygame.sprite.spritecollideany(self, cells)
+                isWall = pygame.sprite.spritecollideany(self, wallGroup)
+        
+            self.rect.move_ip(0, yOffset)
+
+            #Look left
+
+            self.rect.move_ip(-30, 0)
+            xOffset = 30
+
+            currentLook = pygame.sprite.spritecollideany(self, cells)
+            isWall = pygame.sprite.spritecollideany(self, wallGroup)
+            while currentLook != None and self.rect.bottom <= SCREEN_HEIGHT and isWall == None:
+                currentLook.setSight(True)
+                humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
+                seenCells.add(currentLook)
+                self.rect.move_ip(-30, 0)
+                xOffset += 30
+                currentLook = pygame.sprite.spritecollideany(self, cells)
+                isWall = pygame.sprite.spritecollideany(self, wallGroup)
+        
+            self.rect.move_ip(xOffset, 0)
+
+            #Look Right
+
+            self.rect.move_ip(30, 0)
+            xOffset = -30
+
+            currentLook = pygame.sprite.spritecollideany(self, cells)
+            isWall = pygame.sprite.spritecollideany(self, wallGroup)
+            while currentLook != None and self.rect.bottom <= SCREEN_HEIGHT and isWall == None:
+                currentLook.setSight(True)
+                humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
+                seenCells.add(currentLook)
+                self.rect.move_ip(30, 0)
+                xOffset += -30
+                currentLook = pygame.sprite.spritecollideany(self, cells)
+                isWall = pygame.sprite.spritecollideany(self, wallGroup)
+        
+            self.rect.move_ip(xOffset, 0)
+
+        humanScreen.blit(self.surf, self.rect)
         return moveMade
 
     def checkDirections(self, wallGroup):

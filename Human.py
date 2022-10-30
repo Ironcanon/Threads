@@ -21,6 +21,7 @@ class Human(pygame.sprite.Sprite):
         self.rect.move_ip(start)
         self.item = "None"
         self.cold_timer = 0
+        self.win = False
 
         self.lives = 3
 
@@ -34,7 +35,8 @@ class Human(pygame.sprite.Sprite):
         currentCell = pygame.sprite.spritecollideany(self, cells)
         if currentCell != None:
             if currentCell.isFinish:
-                print("Win")
+                self.win = True
+                return
             if self.cold_timer == 0:
                 currentCell.add_heat()
                 heatedCells.add(currentCell)

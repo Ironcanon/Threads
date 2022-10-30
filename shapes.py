@@ -9,6 +9,7 @@ class Cell(pygame.sprite.Sprite):
         image = pygame.image.load("assets/Wall.jpg").convert()
         self.surf = pygame.transform.scale(image, (GAP, GAP))
         self.humanSurf = pygame.transform.scale(image, (GAP, GAP))
+        self.humanSightSurf = pygame.transform.scale(image, (GAP, GAP))
         self.x = x
         self.y = y
         self.isWall = isWall
@@ -16,6 +17,7 @@ class Cell(pygame.sprite.Sprite):
         if(not self.isWall):
             self.surf.fill((0,0,0))
             self.humanSurf.fill((0,0,0))
+            self.humanSightSurf.fill((255, 222, 0))
         self.humanSight = False
         self.rect = self.surf.get_rect(center=(x*GAP+GAP/2, y*GAP+GAP/2))
         self.heat = heat
@@ -35,8 +37,7 @@ class Cell(pygame.sprite.Sprite):
     
     def setSight(self, isSeen):
         self.humanSight = isSeen
-        self.humanSurf.fill((255, 222, 0) if isSeen else (0,0,0))
-        
+
     def __repr__(self):
         return f"{1 if self.isWall else 0}"
     def __str__(self):

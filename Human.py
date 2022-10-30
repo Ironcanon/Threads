@@ -33,7 +33,7 @@ class Human(pygame.sprite.Sprite):
         self.moveRight = True
         self.currentCell = None
 
-    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen, alienScreen, cells, heatedCells, seenCells):
+    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen, alienScreen, cells, heatedCells, seenCells, alien):
 
         moveMade = False
         currentCell = pygame.sprite.spritecollideany(self, cells)
@@ -105,6 +105,8 @@ class Human(pygame.sprite.Sprite):
             while currentLook != None and self.rect.top >= 0 and isWall == None:
                 currentLook.setSight(True)
                 humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
+                if currentLook.containsAlien:
+                    humanScreen.blit(alien.surf, alien.rect)
                 seenCells.add(currentLook)
                 self.rect.move_ip(0, -30)
                 yOffset+=30
@@ -123,6 +125,8 @@ class Human(pygame.sprite.Sprite):
             while currentLook != None and self.rect.bottom <= SCREEN_HEIGHT and isWall == None:
                 currentLook.setSight(True)
                 humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
+                if currentLook.containsAlien:
+                    humanScreen.blit(alien.surf, alien.rect)
                 seenCells.add(currentLook)
                 self.rect.move_ip(0, 30)
                 yOffset += -30
@@ -141,6 +145,8 @@ class Human(pygame.sprite.Sprite):
             while currentLook != None and self.rect.bottom <= SCREEN_HEIGHT and isWall == None:
                 currentLook.setSight(True)
                 humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
+                if currentLook.containsAlien:
+                    humanScreen.blit(alien.surf, alien.rect)
                 seenCells.add(currentLook)
                 self.rect.move_ip(-30, 0)
                 xOffset += 30
@@ -159,6 +165,8 @@ class Human(pygame.sprite.Sprite):
             while currentLook != None and self.rect.bottom <= SCREEN_HEIGHT and isWall == None:
                 currentLook.setSight(True)
                 humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
+                if currentLook.containsAlien:
+                    humanScreen.blit(alien.surf, alien.rect)
                 seenCells.add(currentLook)
                 self.rect.move_ip(30, 0)
                 xOffset += -30

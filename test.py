@@ -47,7 +47,7 @@ screens = [human_screen, alien_screen]
 screen.fill((0, 0, 0))
 
 board = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
-print(board)
+# print(board)
 walls = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 dirty_sprites = pygame.sprite.Group()
@@ -59,11 +59,9 @@ for row in board:
         all_sprites.add(cell)
 
 for sub_screen in screens:
-    # for wall in generate_maze(sub_screen.get_width(), sub_screen.get_height()):
-    #     all_sprites.add(wall)
 
     for entity in all_sprites:
-        sub_screen.blit(entity.surf, entity.rect)
+        sub_screen.blit(entity.getSurf(), entity.rect)
 
 # draw player 1's view  to the top left corner
 screen.blit(human_screen, (0,0))

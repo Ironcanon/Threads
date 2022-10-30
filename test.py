@@ -79,5 +79,5 @@ while running:
         # Did the user click the window close button? If so, stop the loop.
         elif event.type == QUIT:
             running = False
-            
+
     pygame.display.flip()

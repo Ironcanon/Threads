@@ -33,6 +33,20 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 running = True
 
 player = Player()
+testWall = Wall(400, 400)
+testWall2 = Wall(200, 200)
+screen.blit(testWall.surf, (400, 400))
+screen.blit(testWall2.surf, (200, 200))
+
+wallGroup = pygame.sprite.Group()
+allSprites = pygame.sprite.Group()
+allSprites.add(player)
+wallGroup.add(testWall)
+wallGroup.add(testWall2)
+allSprites.add(testWall)
+allSprites.add(testWall2)
+
+clock = pygame.time.Clock()
 
 # Draw the player on the screen
 screen.blit(player.surf, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
@@ -58,9 +72,12 @@ while running:
     # Get all the keys currently pressed
     pressed_keys = pygame.key.get_pressed()
 
-    if player.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT):
+    if player.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup):
         screen.fill((0, 0, 0))
-        screen.blit(player.surf, player.rect)
+        for sprite in allSprites:
+            screen.blit(sprite.surf, sprite.rect)
 
     pygame.display.flip()
+
+    clock.tick(30)
 

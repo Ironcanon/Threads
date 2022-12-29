@@ -11,9 +11,9 @@ class Interactable(pygame.sprite.Sprite):
             pass
 
         self.surf = pygame.Surface((15, 15))
-        self.replaceSurf = pygame.Surface((15, 15))
+        self.replace_surf = pygame.Surface((15, 15))
         self.surf.fill((0, 0, 255))
-        self.replaceSurf.fill((0, 0, 0))
+        self.replace_surf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
         self.rect.move_ip(where)
     

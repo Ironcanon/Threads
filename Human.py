@@ -9,7 +9,7 @@ from pygame.locals import (
     K_w,
     K_SPACE
 )
-from shapes import GAP
+from shapes import GAP, Cell
 
 class Human(pygame.sprite.Sprite):
     def __init__(self, start):
@@ -17,64 +17,69 @@ class Human(pygame.sprite.Sprite):
         super(Human, self).__init__()
         image = pygame.image.load("assets/Astronaut.png").convert()
         self.surf = pygame.transform.scale(image, (size, size))
-        self.replaceSurf = pygame.Surface((size, size))
-        self.replaceSurf.fill((0, 0, 0))
+        self.replace_surf = pygame.Surface((size, size))
+        self.replace_surf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
         self.rect.move_ip(start)
         self.item = "None"
-        self.cold_timer = 0
+        self.cold_time = 0
         self.win = False
+        self.can_see_alien = False
+        self.view_dist = 15
 
         self.lives = 3
 
-        self.moveUp = True
-        self.moveDown = True
-        self.moveLeft = True
-        self.moveRight = True
-        self.currentCell = None
+        self.move_up = True
+        self.move_down = True
+        self.move_left = True
+        self.move_right = True
+        self.current_cell = None
 
-    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, humanScreen, alienScreen, cells, heatedCells, seenCells, alien):
-
+    def update(self, keys_pressed, SCREEN_WIDTH, SCREEN_HEIGHT, wall_group, human_screen, cells, heatedCells, alien):
         moveMade = False
-        currentCell = pygame.sprite.spritecollideany(self, cells)
-        if currentCell != None:
-            if currentCell.isFinish:
+        # Get the cell the human is currently on
+        current_cell = pygame.sprite.spritecollideany(self, cells)
+
+        if current_cell != None:
+            # Check if at the exit
+            if current_cell.isFinish:
                 self.win = True
                 return
-            if self.cold_timer == 0:
-                currentCell.add_heat()
-                heatedCells.add(currentCell)
+            # If human is cold decrease cold time
+            # Else make the current tile hot
+            if self.cold_time == 0:
+                current_cell.add_heat()
+                heatedCells.add(current_cell)
             else:
-                self.cold_timer -= 1
-            # if math.dist([currentCell.x, currentCell.y],[alienPlayer.rect.x, alienPlayer.rect.y]) < 5:
-            #     alienScreen.blit(currentCell.humanSurf, currentCell.rect)
+                self.cold_time -= 1
 
-        if keysPressed[K_w] and self.moveUp:
-            humanScreen.blit(self.replaceSurf, self.rect)
+        if keys_pressed[K_w] and self.move_up:
+            human_screen.blit(self.replace_surf, self.rect)
             self.rect.move_ip(0, -5)
             moveMade = True
-            self.checkDirections(wallGroup)
-        if keysPressed[K_s] and self.moveDown:
-            humanScreen.blit(self.replaceSurf, self.rect)
-            # alienScreen.blit(currentCell.surf, currentCell.rect)
+            self.checkDirections(wall_group)
+
+        if keys_pressed[K_s] and self.move_down:
+            human_screen.blit(self.replace_surf, self.rect)
             self.rect.move_ip(0, 5)
             moveMade = True
-            self.checkDirections(wallGroup)
-        if keysPressed[K_a] and self.moveLeft:
-            humanScreen.blit(self.replaceSurf, self.rect)
-            # alienScreen.blit(currentCell.surf, currentCell.rect)
+            self.checkDirections(wall_group)
+
+        if keys_pressed[K_a] and self.move_left:
+            human_screen.blit(self.replace_surf, self.rect)
             self.rect.move_ip(-5, 0)
             moveMade = True
-            self.checkDirections(wallGroup)
-        if keysPressed[K_d] and self.moveRight:
-            humanScreen.blit(self.replaceSurf, self.rect)
-            # alienScreen.blit(currentCell.surf, currentCell.rect)
+            self.checkDirections(wall_group)
+
+        if keys_pressed[K_d] and self.move_right:
+            human_screen.blit(self.replace_surf, self.rect)
             self.rect.move_ip(5, 0)
             moveMade = True
-            self.checkDirections(wallGroup)
-        if keysPressed[K_SPACE] and self.item == "extinguisher":
+            self.checkDirections(wall_group)
+
+        if keys_pressed[K_SPACE] and self.item == "extinguisher":
             self.item == "None"
-            self.cold_timer = 1000
+            self.cold_time = 1000
 
         # Keep player on the screen
         if self.rect.left < 0:
@@ -85,120 +90,32 @@ class Human(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
+                    
+        if self.can_see_alien:
+            human_screen.blit(alien.surf, alien.rect)
 
-
-
-        if moveMade:
-            seeCellsToRemove = []
-            for cell in seenCells:
-                cell.setSight(False)
-                seeCellsToRemove.append(cell)
-                humanScreen.blit(cell.humanSurf, cell.rect)
-            for cell in seeCellsToRemove:
-                seenCells.remove(cell)
-
-            #Look up
-            yOffset = 30
-            self.rect.move_ip(0, -30)
-            currentLook = pygame.sprite.spritecollideany(self, cells)
-            isWall = pygame.sprite.spritecollideany(self, wallGroup)
-            while currentLook != None and self.rect.top >= 0 and isWall == None:
-                currentLook.setSight(True)
-                humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
-                if currentLook.containsAlien:
-                    humanScreen.blit(alien.surf, alien.rect)
-                seenCells.add(currentLook)
-                self.rect.move_ip(0, -30)
-                yOffset+=30
-                currentLook = pygame.sprite.spritecollideany(self, cells)
-                isWall = pygame.sprite.spritecollideany(self, wallGroup)
-
-            self.rect.move_ip(0, yOffset)
-
-            yOffset = -30
-            self.rect.move_ip(0, 30)
-
-            #Look down
-
-            currentLook = pygame.sprite.spritecollideany(self, cells)
-            isWall = pygame.sprite.spritecollideany(self, wallGroup)
-            while currentLook != None and self.rect.bottom <= SCREEN_HEIGHT and isWall == None:
-                currentLook.setSight(True)
-                humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
-                if currentLook.containsAlien:
-                    humanScreen.blit(alien.surf, alien.rect)
-                seenCells.add(currentLook)
-                self.rect.move_ip(0, 30)
-                yOffset += -30
-                currentLook = pygame.sprite.spritecollideany(self, cells)
-                isWall = pygame.sprite.spritecollideany(self, wallGroup)
-        
-            self.rect.move_ip(0, yOffset)
-
-            #Look left
-
-            self.rect.move_ip(-30, 0)
-            xOffset = 30
-
-            currentLook = pygame.sprite.spritecollideany(self, cells)
-            isWall = pygame.sprite.spritecollideany(self, wallGroup)
-            while currentLook != None and self.rect.bottom <= SCREEN_HEIGHT and isWall == None:
-                currentLook.setSight(True)
-                humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
-                if currentLook.containsAlien:
-                    humanScreen.blit(alien.surf, alien.rect)
-                seenCells.add(currentLook)
-                self.rect.move_ip(-30, 0)
-                xOffset += 30
-                currentLook = pygame.sprite.spritecollideany(self, cells)
-                isWall = pygame.sprite.spritecollideany(self, wallGroup)
-        
-            self.rect.move_ip(xOffset, 0)
-
-            #Look Right
-
-            self.rect.move_ip(30, 0)
-            xOffset = -30
-
-            currentLook = pygame.sprite.spritecollideany(self, cells)
-            isWall = pygame.sprite.spritecollideany(self, wallGroup)
-            while currentLook != None and self.rect.bottom <= SCREEN_HEIGHT and isWall == None:
-                currentLook.setSight(True)
-                humanScreen.blit(currentLook.humanSightSurf, currentLook.rect)
-                if currentLook.containsAlien:
-                    humanScreen.blit(alien.surf, alien.rect)
-                seenCells.add(currentLook)
-                self.rect.move_ip(30, 0)
-                xOffset += -30
-                currentLook = pygame.sprite.spritecollideany(self, cells)
-                isWall = pygame.sprite.spritecollideany(self, wallGroup)
-        
-            self.rect.move_ip(xOffset, 0)
-
-        humanScreen.blit(self.surf, self.rect)
+        human_screen.blit(self.surf, self.rect)
         return moveMade
 
-    def checkDirections(self, wallGroup):
+    def checkDirections(self, wall_group):
             self.rect.move_ip(0, -5)
-            if pygame.sprite.spritecollideany(self, wallGroup) != None:
-                self.moveUp = False
+            if pygame.sprite.spritecollideany(self, wall_group) != None:
+                self.move_up = False
             else:
-                self.moveUp = True
+                self.move_up = True
             self.rect.move_ip(0, 10)
-            if pygame.sprite.spritecollideany(self, wallGroup) != None:
-                self.moveDown = False
+            if pygame.sprite.spritecollideany(self, wall_group) != None:
+                self.move_down = False
             else:
-                self.moveDown = True
+                self.move_down = True
             self.rect.move_ip(-5, -5)
-            if pygame.sprite.spritecollideany(self, wallGroup) != None:
-                self.moveLeft = False
+            if pygame.sprite.spritecollideany(self, wall_group) != None:
+                self.move_left = False
             else:
-                self.moveLeft = True
+                self.move_left = True
             self.rect.move_ip(10, 0)
-            if pygame.sprite.spritecollideany(self, wallGroup) != None:
-                self.moveRight = False
+            if pygame.sprite.spritecollideany(self, wall_group) != None:
+                self.move_right = False
             else:
-                self.moveRight = True       
+                self.move_right = True       
             self.rect.move_ip(-5, 0)  
-
-        

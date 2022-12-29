@@ -3,7 +3,7 @@ import math
 import sys
 import pygame
 from button import Button
-from shapes import GAP, gen_walls_array, gen_walls_array_from_list
+from shapes import GAP, CollisionTest, gen_walls_array, gen_walls_array_from_list
 from Alien import Alien
 from Human import Human
 import ast
@@ -36,8 +36,6 @@ SCREEN_HEIGHT = pygame.display.get_window_size()[1]
 BG = pygame.image.load("assets/Background.png")
 BG = pygame.transform.scale(BG, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# print(gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT))
-
 canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Camera rectangles for sections of  the canvas
@@ -58,8 +56,8 @@ screens = [human_screen, alien_screen]
 screen.fill((0, 0, 0))
 
 with open("board.txt",'r') as file:
-    cellList = ast.literal_eval(file.read())
-    board, (start_alien, start_human) = gen_walls_array_from_list(cellList)
+    cell_list = ast.literal_eval(file.read())
+    board, (start_alien, start_human) = gen_walls_array_from_list(cell_list)
 
 # board, (start_alien, start_human) = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
 # with open("board.txt",'w') as file:
@@ -70,7 +68,7 @@ all_sprites = pygame.sprite.Group()
 dirty_sprites = pygame.sprite.Group()
 floor = pygame.sprite.Group()
 heated_cells = pygame.sprite.Group()
-seenCells = pygame.sprite.Group()
+seen_cells = pygame.sprite.Group()
 interactables = pygame.sprite.Group()
 
 def screen_blit(sprite):
@@ -81,34 +79,18 @@ def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("assets/font.ttf", size)
 
 def main_menu():
+    screen.blit(BG, (0, 0))
     while True:
-        for event in pygame.event.get():
-            screen.blit(BG, (0, 0))
-            # Did the user click the window close button? If so, stop the loop.
-            if event.type == QUIT:
-                running = False
-        coldCells = []
-        for cell in heated_cells:
-            cell.reduce_heat()
-            if cell.heat == 0:
-                coldCells.append(cell)
-            screen_blit(cell)
-        for currentCell in coldCells:
-            heated_cells.remove(currentCell)
-
-        # Get all the keys currently pressed
-        pressed_keys = pygame.key.get_pressed()
-
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
         MENU_TEXT = get_font(100).render("ASTRO VS PRED", True, "#b68f40")
         MENU_RECT = MENU_TEXT.get_rect(center=(SCREEN_WIDTH/2, 100))
 
-        PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(SCREEN_WIDTH/2, 250), 
+        PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 150), 
                             text_input="PLAY", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
-        OPTIONS_BUTTON = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(SCREEN_WIDTH/2, 400), 
+        OPTIONS_BUTTON = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), 
                             text_input="OPTIONS", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
-        QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(SCREEN_WIDTH/2, 550), 
+        QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 150), 
                             text_input="QUIT", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
 
         screen.blit(MENU_TEXT, MENU_RECT)
@@ -145,68 +127,113 @@ def play():
     for entity in all_sprites:
         screen_blit(entity)
 
-    alienPlayer = Alien((GAP*start_alien, 0))
-    humanPlayer = Human((GAP*start_human, SCREEN_HEIGHT))
-    all_sprites.add(alienPlayer)
-    all_sprites.add(humanPlayer)
+    alien_player = Alien((GAP*start_alien, 0))
+    human_player = Human((GAP*start_human, SCREEN_HEIGHT))
+    all_sprites.add(alien_player)
+    all_sprites.add(human_player)
 
-    screens[0].blit(humanPlayer.surf, humanPlayer.rect)
-    screens[1].blit(alienPlayer.surf, alienPlayer.rect)
+    screens[0].blit(human_player.surf, human_player.rect)
+    screens[1].blit(alien_player.surf, alien_player.rect)
 
-    # draw player 1's view  to the top left corner
+    # Draw player 1's view from the top left to middle bottom
     screen.blit(human_screen, (0,0))
-    # player 2's view is in the top right corner
+    # Draw player 2's view is in the top middle to bottom right
     screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
-    # Variable to keep the main loop running
     running = True
+
+    yellow = pygame.Surface((10, 10))
+    yellow.fill((255,233,0))
+    black = pygame.Surface((10, 10))
+    black.fill((0,0,0))
+    sight_markers = []
     # Main loop
     while running:
-        # Look at every event in the queue
+        # Check for quit events
         for event in pygame.event.get():
-            # Did the user hit a key?
             if event.type == KEYDOWN:
-                # Was it the Escape key? If so, stop the loop.
                 if event.key == K_ESCAPE:
                     running = False
-            # Did the user click the window close button? If so, stop the loop.
             elif event.type == QUIT:
                 running = False
-        coldCells = []
+
+        # Store any newly cold cells to remove from heated_cells
+        cold_cells = []
         for cell in heated_cells:
             cell.reduce_heat()
             if cell.heat == 0:
-                coldCells.append(cell)
-            if math.dist([cell.x, cell.y],[alienPlayer.rect.x//GAP, alienPlayer.rect.y//GAP]) < 10:
+                cold_cells.append(cell)
+            # Only show the cell if the alien can see it
+            # TODO: Change this such that once an alien has seen a cell keep updating it
+            if math.dist([cell.x, cell.y],[alien_player.rect.x//GAP, alien_player.rect.y//GAP]) < 10:
+                cell.alien_saw_heat = True
+
+            if cell.alien_saw_heat:
                 screen_blit(cell)
-        for currentCell in coldCells:
-            heated_cells.remove(currentCell)
+
+        # Remove all the completely cold cells from heated_cells
+        for cell in cold_cells:
+            cell.alien_saw_heat = False
+            heated_cells.remove(cell)
             
         # Get all the keys currently pressed
         pressed_keys = pygame.key.get_pressed()
 
-        madeMove = False
+        either_moved = False
 
-        if humanPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen, alien_screen, floor, heated_cells, seenCells, alienPlayer):
-            madeMove = True
+        # Do human updates
+        if human_player.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, human_screen, floor, heated_cells, alien_player):
+            either_moved = True
 
-        if alienPlayer.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, alien_screen, floor):
-            madeMove = True
+        # Do alien updates
+        if alien_player.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT, walls, alien_screen, human_screen, floor):
+            either_moved = True
+
+        if either_moved:
+            if math.dist(human_player.rect.center, alien_player.rect.center) // GAP < human_player.view_dist:
+                for cell in sight_markers:
+                    human_screen.blit(black, cell.rect)
+                sight_markers.clear()
+
+                for x, y in get_line(human_player.rect.center, alien_player.rect.center):
+                    test_sprite = CollisionTest(x, y)
+                    test_sprite.rect.x = x
+                    test_sprite.rect.y = y
+                    current_cell = pygame.sprite.spritecollideany(test_sprite, floor)
+
+                    if current_cell:
+                        human_screen.blit(yellow, current_cell.rect)
+                        sight_markers.append(current_cell)
+
+                    if pygame.sprite.spritecollideany(test_sprite, walls):
+                        human_player.can_see_alien = False   
+                        break
+                else:
+                    human_player.can_see_alien = True
+            else:
+                human_player.can_see_alien = False 
         
+        if human_player.can_see_alien:
+            human_screen.blit(alien_player.surf, alien_player.rect)
+        else:
+            for cell in sight_markers:
+                human_screen.blit(black, cell.rect)
+            sight_markers.clear()
+
         # if madeMove:
         screen.blit(human_screen, (0,0))
         screen.blit(alien_screen, (SCREEN_WIDTH/2, 0))
             
-        if(humanPlayer.win):
+        if(human_player.win):
             win("Astronaut Wins!")
             return
 
         # After the moves are made, check if the alien and human have collided, killing the human
-        human_screen.blit(alienPlayer.surf, alienPlayer.rect)
-        if pygame.sprite.collide_rect(humanPlayer, alienPlayer):
+        human_screen.blit(alien_player.surf, alien_player.rect)
+        if pygame.sprite.collide_rect(human_player, alien_player):
             win("Alien Wins!")
             return
         else:
-            human_screen.blit(alienPlayer.replaceSurf, alienPlayer.rect)
+            human_screen.blit(alien_player.replace_surf, alien_player.rect)
 
         clock.tick(30)
         pygame.display.flip()
@@ -244,6 +271,51 @@ def win(string):
 
         pygame.display.update()
     
+# Taken from https://iqcode.com/code/python/python-bresenham-line-algorithm
+def get_line(start, end):
+    x1, y1 = start
+    x2, y2 = end
+    dx = x2 - x1
+    dy = y2 - y1
+ 
+    # Determine how steep the line is
+    is_steep = abs(dy) > abs(dx)
+ 
+    # Rotate line
+    if is_steep:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
+ 
+    # Swap start and end points if necessary and store swap state
+    swapped = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        swapped = True
+ 
+    # Recalculate differentials
+    dx = x2 - x1
+    dy = y2 - y1
+ 
+    # Calculate error
+    error = int(dx / 2.0)
+    ystep = GAP if y1 < y2 else - GAP
+ 
+    # Iterate over bounding box generating points between start and end
+    y = y1
+    points = []
+    for x in range(x1, x2 + 1, GAP):
+        coord = (y, x) if is_steep else (x, y)
+        points.append(coord)
+        error -= abs(dy)
+        if error < 0:
+            y += ystep
+            error += dx
+ 
+    # Reverse the list if the coordinates were swapped
+    if swapped:
+        points.reverse()
+    return points
 
 if __name__ == "__main__":
     main_menu()

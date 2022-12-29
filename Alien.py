@@ -15,39 +15,46 @@ class Alien(pygame.sprite.Sprite):
         super(Alien, self).__init__()
         image = pygame.image.load("assets/Alien.png").convert()
         self.surf = pygame.transform.scale(image, (size, size))
-        self.replaceSurf = pygame.Surface((size, size))
-        self.replaceSurf.fill((0, 0, 0))
+        self.replace_surf = pygame.Surface((size, size))
+        self.replace_surf.fill((0, 0, 0))
         self.rect = self.surf.get_rect()
         self.rect.move_ip(start)
 
-        self.moveUp = True
-        self.moveDown = True
-        self.moveLeft = True
-        self.moveRight = True
-        self.currentCell = None
+        self.move_up = True
+        self.move_down = True
+        self.move_left = True
+        self.move_right = True
+        self.current_cell = None
 
-    def update(self, keysPressed, SCREEN_WIDTH, SCREEN_HEIGHT, wallGroup, alienScreen, cells):
+    def update(self, keys_pressed, SCREEN_WIDTH, SCREEN_HEIGHT, wall_group, alien_screen, human_screen, cells):
         moveMade = False
-        if keysPressed[K_UP] and self.moveUp:
-            alienScreen.blit(self.replaceSurf, self.rect)
+        if keys_pressed[K_UP] and self.move_up:
+            alien_screen.blit(self.replace_surf, self.rect)
+            human_screen.blit(self.replace_surf, self.rect)
             self.rect.move_ip(0, -MOVE_SPEED)
             moveMade = True
-            self.checkDirections(wallGroup)
-        if keysPressed[K_DOWN] and self.moveDown:
-            alienScreen.blit(self.replaceSurf, self.rect)
+            self.checkDirections(wall_group)
+
+        if keys_pressed[K_DOWN] and self.move_down:
+            alien_screen.blit(self.replace_surf, self.rect)
+            human_screen.blit(self.replace_surf, self.rect)
             self.rect.move_ip(0, MOVE_SPEED)
             moveMade = True
-            self.checkDirections(wallGroup)
-        if keysPressed[K_LEFT] and self.moveLeft:
-            alienScreen.blit(self.replaceSurf, self.rect)            
+            self.checkDirections(wall_group)
+
+        if keys_pressed[K_LEFT] and self.move_left:
+            alien_screen.blit(self.replace_surf, self.rect)
+            human_screen.blit(self.replace_surf, self.rect)            
             self.rect.move_ip(-MOVE_SPEED, 0)
             moveMade = True
-            self.checkDirections(wallGroup)
-        if keysPressed[K_RIGHT] and self.moveRight:
-            alienScreen.blit(self.replaceSurf, self.rect)
+            self.checkDirections(wall_group)
+
+        if keys_pressed[K_RIGHT] and self.move_right:
+            alien_screen.blit(self.replace_surf, self.rect)
+            human_screen.blit(self.replace_surf, self.rect)
             self.rect.move_ip(MOVE_SPEED, 0)
             moveMade = True
-            self.checkDirections(wallGroup)
+            self.checkDirections(wall_group)
 
         # Keep player on the screen
         if self.rect.left < 0:
@@ -59,36 +66,36 @@ class Alien(pygame.sprite.Sprite):
         if self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
 
-        alienScreen.blit(self.surf, self.rect)
+        alien_screen.blit(self.surf, self.rect)
 
         if moveMade:
-            if (self.currentCell != None):
-                self.currentCell.setAlien(False)
-            self.currentCell = pygame.sprite.spritecollideany(self, cells)
-            self.currentCell.setAlien(True)
+            if (self.current_cell != None):
+                self.current_cell.setAlien(False)
+            self.current_cell = pygame.sprite.spritecollideany(self, cells)
+            self.current_cell.setAlien(True)
 
 
         return moveMade
 
-    def checkDirections(self, wallGroup):
+    def checkDirections(self, wall_group):
             self.rect.move_ip(0, -5)
-            if pygame.sprite.spritecollideany(self, wallGroup) != None:
-                self.moveUp = False
+            if pygame.sprite.spritecollideany(self, wall_group) != None:
+                self.move_up = False
             else:
-                self.moveUp = True
+                self.move_up = True
             self.rect.move_ip(0, 10)
-            if pygame.sprite.spritecollideany(self, wallGroup) != None:
-                self.moveDown = False
+            if pygame.sprite.spritecollideany(self, wall_group) != None:
+                self.move_down = False
             else:
-                self.moveDown = True
+                self.move_down = True
             self.rect.move_ip(-5, -5)
-            if pygame.sprite.spritecollideany(self, wallGroup) != None:
-                self.moveLeft = False
+            if pygame.sprite.spritecollideany(self, wall_group) != None:
+                self.move_left = False
             else:
-                self.moveLeft = True
+                self.move_left = True
             self.rect.move_ip(10, 0)
-            if pygame.sprite.spritecollideany(self, wallGroup) != None:
-                self.moveRight = False
+            if pygame.sprite.spritecollideany(self, wall_group) != None:
+                self.move_right = False
             else:
-                self.moveRight = True       
+                self.move_right = True       
             self.rect.move_ip(-5, 0)  

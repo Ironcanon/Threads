@@ -176,7 +176,6 @@ def play():
             cell.reduce_heat()
             if cell.heat == 0:
                 coldCells.append(cell)
-            print(math.dist([cell.x, cell.y],[alienPlayer.rect.x//GAP, alienPlayer.rect.y//GAP]))
             if math.dist([cell.x, cell.y],[alienPlayer.rect.x//GAP, alienPlayer.rect.y//GAP]) < 10:
                 screen_blit(cell)
         for currentCell in coldCells:

@@ -1,5 +1,7 @@
 import pygame
 
+MOVE_SPEED = 5
+
 from pygame.locals import (
     K_UP,
     K_DOWN,
@@ -28,22 +30,22 @@ class Alien(pygame.sprite.Sprite):
         moveMade = False
         if keysPressed[K_UP] and self.moveUp:
             alienScreen.blit(self.replaceSurf, self.rect)
-            self.rect.move_ip(0, -3)
+            self.rect.move_ip(0, -MOVE_SPEED)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_DOWN] and self.moveDown:
             alienScreen.blit(self.replaceSurf, self.rect)
-            self.rect.move_ip(0, 3)
+            self.rect.move_ip(0, MOVE_SPEED)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_LEFT] and self.moveLeft:
             alienScreen.blit(self.replaceSurf, self.rect)            
-            self.rect.move_ip(-3, 0)
+            self.rect.move_ip(-MOVE_SPEED, 0)
             moveMade = True
             self.checkDirections(wallGroup)
         if keysPressed[K_RIGHT] and self.moveRight:
             alienScreen.blit(self.replaceSurf, self.rect)
-            self.rect.move_ip(3, 0)
+            self.rect.move_ip(MOVE_SPEED, 0)
             moveMade = True
             self.checkDirections(wallGroup)
 

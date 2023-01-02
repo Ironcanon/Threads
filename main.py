@@ -60,6 +60,9 @@ with open("board.txt",'r') as file:
     board, (start_alien, start_human) = gen_walls_array_from_list(cell_list)
 
 # board, (start_alien, start_human) = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+# print(len(board),start_alien,start_human)
+
 # with open("board.txt",'w') as file:
 #     file.write(str(board))
 

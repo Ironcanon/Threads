@@ -6,9 +6,9 @@ GAP = 30
 class Cell(pygame.sprite.Sprite):
     def __init__(self, x, y, isWall=False, heat=0, isFinish=False):
         super(Cell, self).__init__()
-        image = pygame.image.load("assets/Wall.jpg").convert()
-        self.surf = pygame.transform.scale(image, (GAP, GAP))
-        self.humanSurf = pygame.transform.scale(image, (GAP, GAP))
+        self.image = pygame.image.load("assets/Wall.jpg").convert()
+        self.surf = pygame.transform.scale(self.image, (GAP, GAP))
+        self.humanSurf = pygame.transform.scale(self.image, (GAP, GAP))
         self.x = x
         self.y = y
         self.isWall = isWall
@@ -32,13 +32,19 @@ class Cell(pygame.sprite.Sprite):
 
     def set_wall(self, isWall):
         self.isWall = isWall
-        self.surf.fill((255,255,255) if isWall else (0,0,0))
+        if isWall:
+            self.surf = pygame.transform.scale(self.image, (GAP, GAP))
+            self.humanSurf = pygame.transform.scale(self.image, (GAP, GAP))
+        else:
+            self.surf.fill((0,0,0))
+            self.humanSurf.fill((0,0,0))
 
     def setAlien(self, hasAlien):
         self.containsAlien = hasAlien
 
     def __repr__(self):
         return f"{1 if self.isWall else 0}"
+    
     def __str__(self):
         return f"{1 if self.isWall else 0}"
 
@@ -55,8 +61,8 @@ def gen_walls_array(screen_width, screen_hight):
     rand_top = randint(1, len(walls[0])-2)
     rand_bot = randint(1, len(walls[-1])-2)
     
-    print(f"H-W: {num_hight}-{num_width}")
-    gen_random_rooms(walls, num_width, num_hight, 14, 15,5)
+    # print(f"H-W: {num_hight}-{num_width}")
+    gen_random_rooms(walls, num_width, num_hight, 9, 15,5)
 
     walls[0][rand_top].set_wall(False)
     walls[1][rand_top].set_wall(False)
@@ -70,7 +76,7 @@ def gen_walls_array_from_list(board):
     for y, line in enumerate(board):
         cells = []
         for x, val in enumerate(line):
-            cells.append(Cell(x, y, val))
+            cells.append(Cell(x, y, isWall=val))
         walls.append(cells)
     walls[0][board[0].index(0)].isFinish = True
     return (walls, (board[0].index(0), board[-1].index(0)))
@@ -91,8 +97,8 @@ def gen_random_rooms(walls,num_width, num_hight, number_of_rooms, max_size, min_
             x1 = randint(0, num_width-min_size)
             nested_attempts = 0
             while(True):
-                attempts += 1
-                if attempts > 30:
+                nested_attempts += 1
+                if nested_attempts > 30:
                     x2 = x1 + 2
                     break
                 x2 = randint(x1, num_width-2)
@@ -142,7 +148,8 @@ def gen_random_rooms(walls,num_width, num_hight, number_of_rooms, max_size, min_
             doors.append((rand_y, rand_x-1))
             doors.append((rand_y, rand_x+1))
         doors.append((rand_y, rand_x))
-            
+
+        print(f"({x1}, {y1}) - ({x2}, {y2})")    
         
         for x in range(x1,x2+1):
             for y in range(y1,y2+1):

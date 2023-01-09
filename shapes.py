@@ -61,7 +61,7 @@ def gen_walls_array(screen_width, screen_hight):
     rand_top = randint(1, len(walls[0])-2)
     rand_bot = randint(1, len(walls[-1])-2)
     
-    # print(f"H-W: {num_hight}-{num_width}")
+    print(f"H-W: {num_hight}-{num_width}")
     gen_random_rooms(walls, num_width, num_hight, 9, 15,5)
 
     walls[0][rand_top].set_wall(False)

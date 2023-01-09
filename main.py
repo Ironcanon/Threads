@@ -1,6 +1,7 @@
 # Import the pygame module
 import math
 import sys
+from MapGenerator import MapGenerator
 import pygame
 from button import Button
 from shapes import GAP, CollisionTest, gen_walls_array, gen_walls_array_from_list
@@ -55,9 +56,16 @@ screens = [human_screen, alien_screen]
 
 screen.fill((0, 0, 0))
 
-with open("board.txt",'r') as file:
-    cell_list = ast.literal_eval(file.read())
-    board, (start_alien, start_human) = gen_walls_array_from_list(cell_list)
+# with open("board.txt",'r') as file:
+#     cell_list = ast.literal_eval(file.read())
+#     board, (start_alien, start_human) = gen_walls_array_from_list(cell_list)
+
+map_gen = MapGenerator("DefaultRooms.json")
+map_gen.generate(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+board = map_gen.map
+start_alien = map_gen.alien_start
+start_human = map_gen.human_start
 
 # board, (start_alien, start_human) = gen_walls_array(SCREEN_WIDTH, SCREEN_HEIGHT)
 
@@ -119,19 +127,22 @@ def main_menu():
 
 def play():
     for row in board:
-        for cell in row:
-            if cell.isWall:
-                walls.add(cell)
-            else:
-                floor.add(cell)
-                    
-            all_sprites.add(cell)
+        for room in row:
+            for room_row in room:
+                for cell in room_row:
+                    if cell.isWall:
+                        walls.add(cell)
+                    else:
+                        floor.add(cell)
+                            
+                    all_sprites.add(cell)
+            
 
     for entity in all_sprites:
         screen_blit(entity)
 
-    alien_player = Alien((GAP*start_alien, 0))
-    human_player = Human((GAP*start_human, SCREEN_HEIGHT))
+    alien_player = Alien((GAP*start_alien[0], GAP*start_alien[1]))
+    human_player = Human((GAP*start_human[0], GAP*start_human[1]))
     all_sprites.add(alien_player)
     all_sprites.add(human_player)
 
@@ -199,8 +210,8 @@ def play():
 
                 for x, y in get_line(human_player.rect.center, alien_player.rect.center):
                     test_sprite = CollisionTest(x, y)
-                    test_sprite.rect.x = x
-                    test_sprite.rect.y = y
+                    # test_sprite.rect.x = x
+                    # test_sprite.rect.y = y
                     current_cell = pygame.sprite.spritecollideany(test_sprite, floor)
 
                     if current_cell:

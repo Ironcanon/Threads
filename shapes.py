@@ -21,13 +21,16 @@ class Cell(pygame.sprite.Sprite):
         self.alien_saw_heat = False
         self.containsAlien = False
     
-    def add_heat(self):
-        self.heat = 255
-        self.surf.fill((255, 0, 0))
+    def add_heat(self, temperature):
+        if temperature > self.heat:
+            self.heat = temperature
+            self.surf.fill((temperature, 0, 0))
         
     def reduce_heat(self):
         if self.heat > 0:
             self.heat-=3
+            if self.heat < 0:
+                self.heat = 0
             self.surf.fill((self.heat, 0, 0))
 
     def set_wall(self, isWall):

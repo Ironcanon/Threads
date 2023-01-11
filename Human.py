@@ -23,6 +23,9 @@ class Human(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect()
         self.rect.move_ip(start)
         self.item = "None"
+        self.bodyTemperature = 150
+        self.stamina = 500
+        self.tired = False
         self.cold_time = 0
         self.win = False
         self.can_see_alien = False
@@ -43,9 +46,6 @@ class Human(pygame.sprite.Sprite):
 
         moveSpeed = 5
 
-        if (keys_pressed[K_LSHIFT]):
-            moveSpeed = 8
-
         if current_cell != None:
             # Check if at the exit
             if current_cell.isFinish:
@@ -54,8 +54,10 @@ class Human(pygame.sprite.Sprite):
             # If human is cold decrease cold time
             # Else make the current tile hot
             if self.cold_time == 0:
-                current_cell.add_heat()
+                current_cell.add_heat(self.bodyTemperature)
                 heatedCells.add(current_cell)
+                if self.bodyTemperature > 150:
+                    self.bodyTemperature -= 1
             else:
                 self.cold_time -= 1
 
@@ -63,6 +65,14 @@ class Human(pygame.sprite.Sprite):
         downMove = False
         leftMove = False
         rightMove = False
+        sprinting = False
+
+        if (not self.tired) and self.stamina > 0 and (keys_pressed[K_LSHIFT]):
+            sprinting = True
+            moveSpeed = 8
+            self.bodyTemperature += 3
+            if self.bodyTemperature > 255:
+                self.bodyTemperature = 255
 
         # Move the human one step at a time
         for step in range(0, moveSpeed):
@@ -102,6 +112,23 @@ class Human(pygame.sprite.Sprite):
         if keys_pressed[K_SPACE] and self.item == "extinguisher":
             self.item == "None"
             self.cold_time = 1000
+
+        if moveMade and sprinting:
+            self.stamina -= 10
+            if self.stamina <= 0:
+                self.tired = True
+        elif moveMade:
+            self.stamina += 1
+            if self.stamina > 200:
+                self.tired = False
+                if self.stamina > 500:
+                    self.stamina = 500
+        elif not moveMade:
+            self.stamina += 3
+            if self.stamina > 200:
+                self.tired = False
+                if self.stamina > 500:
+                    self.stamina = 500
 
         # Keep player on the screen
         if self.rect.left < 0:

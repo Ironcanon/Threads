@@ -27,35 +27,9 @@ class Alien(pygame.sprite.Sprite):
         self.current_cell = None
 
     def update(self, keys_pressed, SCREEN_WIDTH, SCREEN_HEIGHT, wall_group, alien_screen, human_screen, cells):
+        
         moveMade = False
         moveSpeed = 7
-        # if keys_pressed[K_UP] and self.move_up:
-        #     alien_screen.blit(self.replace_surf, self.rect)
-        #     human_screen.blit(self.replace_surf, self.rect)
-        #     self.rect.move_ip(0, -MOVE_SPEED)
-        #     moveMade = True
-        #     self.checkDirections(wall_group)
-
-        # if keys_pressed[K_DOWN] and self.move_down:
-        #     alien_screen.blit(self.replace_surf, self.rect)
-        #     human_screen.blit(self.replace_surf, self.rect)
-        #     self.rect.move_ip(0, MOVE_SPEED)
-        #     moveMade = True
-        #     self.checkDirections(wall_group)
-
-        # if keys_pressed[K_LEFT] and self.move_left:
-        #     alien_screen.blit(self.replace_surf, self.rect)
-        #     human_screen.blit(self.replace_surf, self.rect)            
-        #     self.rect.move_ip(-MOVE_SPEED, 0)
-        #     moveMade = True
-        #     self.checkDirections(wall_group)
-
-        # if keys_pressed[K_RIGHT] and self.move_right:
-        #     alien_screen.blit(self.replace_surf, self.rect)
-        #     human_screen.blit(self.replace_surf, self.rect)
-        #     self.rect.move_ip(MOVE_SPEED, 0)
-        #     moveMade = True
-        #     self.checkDirections(wall_group)
 
         upMove = False
         downMove = False

@@ -7,7 +7,8 @@ from pygame.locals import (
     K_s,
     K_d,
     K_w,
-    K_SPACE
+    K_SPACE,
+    K_LSHIFT
 )
 from shapes import GAP, Cell
 
@@ -40,6 +41,11 @@ class Human(pygame.sprite.Sprite):
         # Get the cell the human is currently on
         current_cell = pygame.sprite.spritecollideany(self, cells)
 
+        moveSpeed = 5
+
+        if (keys_pressed[K_LSHIFT]):
+            moveSpeed = 8
+
         if current_cell != None:
             # Check if at the exit
             if current_cell.isFinish:
@@ -53,29 +59,45 @@ class Human(pygame.sprite.Sprite):
             else:
                 self.cold_time -= 1
 
-        if keys_pressed[K_w] and self.move_up:
-            human_screen.blit(self.replace_surf, self.rect)
-            self.rect.move_ip(0, -5)
-            moveMade = True
-            self.checkDirections(wall_group)
+        upMove = False
+        downMove = False
+        leftMove = False
+        rightMove = False
 
-        if keys_pressed[K_s] and self.move_down:
-            human_screen.blit(self.replace_surf, self.rect)
-            self.rect.move_ip(0, 5)
-            moveMade = True
-            self.checkDirections(wall_group)
+        # Move the human one step at a time
+        for step in range(0, moveSpeed):
+            if keys_pressed[K_w]:
+                human_screen.blit(self.replace_surf, self.rect)
+                self.rect.move_ip(0, -1)
+                upMove = True
+                if pygame.sprite.spritecollideany(self, wall_group):
+                    self.rect.move_ip(0, 1)
+                    upMove = False
+            if keys_pressed[K_s]:
+                human_screen.blit(self.replace_surf, self.rect)
+                self.rect.move_ip(0, 1)
+                downMove = True
+                if pygame.sprite.spritecollideany(self, wall_group):
+                    self.rect.move_ip(0, -1)
+                    downMove = False
+            if keys_pressed[K_a]:
+                human_screen.blit(self.replace_surf, self.rect)
+                self.rect.move_ip(-1, 0)
+                leftMove = True
+                if pygame.sprite.spritecollideany(self, wall_group):
+                    self.rect.move_ip(1, 0)
+                    leftMove = False
+            if keys_pressed[K_d]:
+                human_screen.blit(self.replace_surf, self.rect)
+                self.rect.move_ip(1, 0)
+                rightMove = True
+                if pygame.sprite.spritecollideany(self, wall_group):
+                    self.rect.move_ip(-1, 0)
+                    rightMove = False
 
-        if keys_pressed[K_a] and self.move_left:
-            human_screen.blit(self.replace_surf, self.rect)
-            self.rect.move_ip(-5, 0)
-            moveMade = True
-            self.checkDirections(wall_group)
-
-        if keys_pressed[K_d] and self.move_right:
-            human_screen.blit(self.replace_surf, self.rect)
-            self.rect.move_ip(5, 0)
-            moveMade = True
-            self.checkDirections(wall_group)
+            if moveMade == False:
+                if upMove or downMove or leftMove or rightMove:
+                    moveMade = True
 
         if keys_pressed[K_SPACE] and self.item == "extinguisher":
             self.item == "None"
@@ -96,26 +118,3 @@ class Human(pygame.sprite.Sprite):
 
         human_screen.blit(self.surf, self.rect)
         return moveMade
-
-    def checkDirections(self, wall_group):
-            self.rect.move_ip(0, -5)
-            if pygame.sprite.spritecollideany(self, wall_group) != None:
-                self.move_up = False
-            else:
-                self.move_up = True
-            self.rect.move_ip(0, 10)
-            if pygame.sprite.spritecollideany(self, wall_group) != None:
-                self.move_down = False
-            else:
-                self.move_down = True
-            self.rect.move_ip(-5, -5)
-            if pygame.sprite.spritecollideany(self, wall_group) != None:
-                self.move_left = False
-            else:
-                self.move_left = True
-            self.rect.move_ip(10, 0)
-            if pygame.sprite.spritecollideany(self, wall_group) != None:
-                self.move_right = False
-            else:
-                self.move_right = True       
-            self.rect.move_ip(-5, 0)  
